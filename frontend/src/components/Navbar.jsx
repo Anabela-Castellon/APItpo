@@ -144,9 +144,13 @@ const Navbar = () => {
           </Link>
         )}
 
-        <Link to="/cart" className="nav-circle-btn nav-cart" title="Carrito">
+        <Link
+          to={isLoggedIn ? "/cart" : "/login"}
+          className="nav-circle-btn nav-cart"
+          title={isLoggedIn ? "Carrito" : "Iniciar sesión para ver el carrito"}
+        >
           <CartIcon />
-          {totalItems > 0 && (
+          {isLoggedIn && totalItems > 0 && (
             <span className="cart-badge">{totalItems}</span>
           )}
         </Link>

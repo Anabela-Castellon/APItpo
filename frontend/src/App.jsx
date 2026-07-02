@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { Provider } from "react-redux";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Provider, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import store, { persistor } from "./store/store";
 
@@ -20,6 +20,12 @@ import Favoritos from "./pages/Favoritos";
 import AdminProductos from "./pages/admin/AdminProductos";
 import AdminPlaceholder from "./pages/admin/AdminPlaceholder";
 
+const RequireAuth = ({ children }) => {
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+    const location = useLocation();
+    return isLoggedIn ? children : <Navigate to="/login" state={{ from: location }} replace />;
+};
+
 const AppLayout = () => {
     const location = useLocation();
     const isAdmin = location.pathname.startsWith('/admin');
@@ -33,8 +39,8 @@ const AppLayout = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/cart" element={<RequireAuth><Cart /></RequireAuth>} />
+                <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
                 <Route path="/cart-redux" element={<CartRedux />} />
                 <Route path="/perfil" element={<Perfil />} />
                 <Route path="/mis-pedidos" element={<MisPedidos />} />
