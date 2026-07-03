@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { apiFetch } from '../services/api';
+import { apiFetch, getRolesFromToken } from '../services/api';
 
 export const loginUser = createAsyncThunk(
   'auth/login',
@@ -18,6 +18,7 @@ export const loginUser = createAsyncThunk(
 const initialState = {
   token: localStorage.getItem('token') || null,
   isLoggedIn: !!localStorage.getItem('token'),
+  roles: getRolesFromToken(localStorage.getItem('token')),
   loading: false,
   error: null,
 };
@@ -29,10 +30,12 @@ const authSlice = createSlice({
     logout: (state) => {
       state.token = null;
       state.isLoggedIn = false;
+      state.roles = [];
     },
     setCredentials: (state, action) => {
       state.token = action.payload;
       state.isLoggedIn = true;
+      state.roles = getRolesFromToken(action.payload);
       state.error = null;
     },
   },
@@ -46,6 +49,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload;
         state.isLoggedIn = true;
+        state.roles = getRolesFromToken(action.payload);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;

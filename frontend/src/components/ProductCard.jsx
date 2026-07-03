@@ -2,93 +2,79 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useContext/CartContext';
 import { toggleFavorito } from '../store/favoritosSlice';
 import { useDispatch, useSelector } from "react-redux";
+import { getImagenUrl } from '../services/api';
 import faheart from '../assets/heart-solid-full.svg';
 import faheartn from '../assets/heart-regular-full.svg'
 
 const ProductCard = ({ product }) => {
-    const { addToCart } = useCart();
+    const { addToCart, cartItems } = useCart();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-    // FIX 1: Use 'product.id' instead of just 'id'
     const esFavorito = useSelector((state) =>
         isLoggedIn && state.favoritos.items.some((item) => item.id === Number(product.id))
     );
 
-    // Helper function to handle the favorite click
+    const enCarrito = cartItems.find((item) => item.id === product.id)?.quantity || 0;
+    const sinStock = product.stock !== undefined && product.stock <= 0;
+    const alcanzoLimite = product.stock !== undefined && enCarrito >= product.stock;
+    const primeraImagen = product.imagenes?.[0];
+
     const handleToggleFavorite = (e) => {
-        e.preventDefault(); // Prevents the Link from triggering (if it bubbles)
-        e.stopPropagation(); // Stops the click event from reaching parent elements
+        e.preventDefault();
+        e.stopPropagation();
 
         if (!isLoggedIn) {
             navigate('/login');
             return;
         }
 
-        // FIX 2: Use 'product' instead of 'producto'
         dispatch(toggleFavorito(product));
     };
 
     return (
         <div className="product-card">
-
-            {/* Container added to hold both the image and the button.
-        'position: relative' allows the absolute button to map to this box.
-      */}
-            <div className="product-image-container" style={{ position: 'relative' }}>
+            <div className="product-image-container">
                 <Link to={`/producto/${product.id}`} className="product-card-link">
-                    {product.imagen ? (
-                        <img src={product.imagen} alt={product.nombre} className="product-img" />
+                    {primeraImagen ? (
+                        <img src={getImagenUrl(product.id, primeraImagen.id)} alt={product.nombre} className="product-img" />
                     ) : (
-                        <div className="product-img-placeholder" style={{ height: '200px', backgroundColor: '#f0f0f0' }}>
-                            {/* Placeholder styling fallback */}
-                        </div>
+                        <div className="product-img-placeholder" aria-hidden="true">🎂</div>
                     )}
                 </Link>
 
-                {/* FIX 3: Extracted button outside the Link and positioned it absolutely */}
-                <button  type="reset"
+                <button
+                    type="button"
+                    className="product-fav-btn"
                     onClick={handleToggleFavorite}
-                    style={{
-                        position: 'absolute',
-                        top: '5px',
-                        right: '5px',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '5px',
-                        zIndex: 30,
-                        transition: 'transform 0.2s',
-                         // Helps visibility over images
-                    }}
                     title={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
                 >
-                {esFavorito ? (
-                    <img src={faheart} alt="Favorito" style={{ width: '24px', height: '24px' }} />
-                ) : (
-                    <img src={faheartn} alt="No favorito" style={{ width: '24px', height: '24px', fill:"pink" }} />
-                )}
-                </button >
+                    <img src={esFavorito ? faheart : faheartn} alt="" style={{ width: '20px', height: '20px' }} />
+                </button>
             </div>
 
             <div className="product-info">
                 <Link to={`/producto/${product.id}`} className="product-card-link">
                     <h3>{product.nombre}</h3>
                 </Link>
-                <span className="price">${product.precio.toLocaleString('es-AR')}</span>
+                <div className="product-info-row">
+                    <div>
+                        <span className="price">${product.precio.toLocaleString('es-AR')}</span>
+                        <div className="availability">
+                            <span className="dot"></span> {sinStock ? 'Sin stock' : 'Disponible hoy'}
+                        </div>
+                    </div>
 
-                <div className="availability">
-                    <span className="dot" style={{ color: 'green' }}>●</span> Disponible hoy
+                    <button
+                        className="btn-add"
+                        onClick={() => addToCart(product)}
+                        title={alcanzoLimite ? 'Alcanzaste el stock disponible' : 'Agregar al carrito'}
+                        disabled={sinStock || alcanzoLimite}
+                    >
+                        +
+                    </button>
                 </div>
-
-                <button
-                    className="btn-add"
-                    onClick={() => addToCart(product)}
-                    title="Agregar al carrito"
-                >
-                    +
-                </button>
             </div>
         </div>
     );

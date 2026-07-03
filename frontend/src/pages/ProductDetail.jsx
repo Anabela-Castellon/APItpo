@@ -1,117 +1,222 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../hooks/useContext/CartContext';
-// Importaciones de Redux
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleFavorito } from '../store/favoritosSlice';
+import { apiFetch, getImagenUrl } from '../services/api';
+import faheart from '../assets/heart-solid-full.svg';
+import faheartn from '../assets/heart-regular-full.svg';
+import enviosIcon from '../assets/envios.png';
+import productosIcon from '../assets/productoss.png';
+import pedidosIcon from '../assets/pedidoss.png';
+import retiroIcon from '../assets/retiro.png';
+import '../styles/catalog.css';
+import '../styles/productDetail.css';
 
 const ProductDetail = () => {
-  // useParams nos da el :id que está en la URL (ej: /producto/5 → id = "5")
   const { id } = useParams();
- 
+  const navigate = useNavigate();
+
   const [producto, setProducto] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
- 
-  // Estado para el feedback visual del botón ("Agregar" / "✓ Agregado")
-  const [agregado, setAgregado] = useState(false);
- 
-  // Traemos addToCart del contexto del carrito
-  const { addToCart } = useCart();
-    // Configuración de Redux
+  const [imagenActiva, setImagenActiva] = useState(0);
+  const [cantidad, setCantidad] = useState(1);
+
+  const { addToCart, cartItems } = useCart();
   const dispatch = useDispatch();
-    // Buscamos en el store si este producto ID ya es favorito
-  const esFavorito = useSelector((state) => state.favoritos.items.some((item) => item.id === Number(id))
-    );
- 
-  // Cada vez que cambia el id en la URL, volvemos a buscar el producto
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const esFavorito = useSelector((state) => state.favoritos.items.some((item) => item.id === Number(id)));
+
   useEffect(() => {
     const fetchProductoDetalle = async () => {
+      setCargando(true);
+      setImagenActiva(0);
+      setCantidad(1);
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/api/productos/${id}`, {
-          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        });
- 
-        if (response.ok) {
-          const data = await response.json();
-          setProducto(data);
-        } else {
-          setError('No se pudo cargar el detalle del producto.');
-        }
+        const data = await apiFetch(`/productos/${id}`);
+        setProducto(data);
       } catch (err) {
         console.error('Error fetching producto detalle:', err);
-        setError('Error al conectar con el servidor.');
+        setError('No se pudo cargar el detalle del producto.');
       } finally {
         setCargando(false);
       }
     };
- 
-    if (id) fetchProductoDetalle();
-  }, [id]); // Se vuelve a ejecutar si el id cambia
- 
-  const handleAgregarAlCarrito = () => {
-    addToCart(producto);
- 
-    // Mostramos "✓ Agregado" por 2 segundos y después volvemos al texto original
-    setAgregado(true);
-    setTimeout(() => setAgregado(false), 2000);
-  };
- 
-  // Pantallas de carga, error o producto no encontrado
-  if (cargando) return <h2>Cargando detalle del producto...</h2>;
-  if (error) return <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>;
-  if (!producto) return <p style={{ textAlign: 'center' }}>Producto no encontrado.</p>;
- 
-  return (
-    <div style={{
-      maxWidth: '600px',
-      margin: '20px auto',
-      padding: '20px',
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      textAlign: 'left'
-    }}>
-      {/* Flecha para volver al catálogo */}
-      <Link to="/" style={{ textDecoration: 'none', color: '#aa3bff', fontWeight: 'bold' }}>
-        ← Volver al catálogo
-      </Link>
-        {/* Título y Botón de Favorito alineados */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
-            <h2 style={{ margin: 0 }}>{producto.nombre}</h2>
 
+    if (id) fetchProductoDetalle();
+  }, [id]);
+
+  if (cargando) return <p style={{ textAlign: 'center', padding: '4rem' }}>Cargando detalle del producto...</p>;
+  if (error) return <p style={{ color: 'red', textAlign: 'center', padding: '4rem' }}>{error}</p>;
+  if (!producto) return <p style={{ textAlign: 'center', padding: '4rem' }}>Producto no encontrado.</p>;
+
+  const imagenes = producto.imagenes || [];
+  const stock = producto.stock ?? Infinity;
+  const enCarrito = cartItems.find((item) => item.id === producto.id)?.quantity || 0;
+  const disponibleParaAgregar = Math.max(stock - enCarrito, 0);
+  const sinStock = stock <= 0;
+  const categoriaNombre = producto.categorias?.[0]?.nombre;
+
+  const handleToggleFavorite = () => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    dispatch(toggleFavorito(producto));
+  };
+
+  const handleAgregarAlCarrito = () => {
+    addToCart(producto, cantidad);
+  };
+
+  const handleComprarAhora = () => {
+    addToCart(producto, cantidad);
+    navigate('/checkout');
+  };
+
+  return (
+    <div className="pd-page">
+      <div className="pd-breadcrumb">
+        <Link to="/">Inicio</Link>
+        <span>›</span>
+        {categoriaNombre && (
+          <>
+            <span>{categoriaNombre}</span>
+            <span>›</span>
+          </>
+        )}
+        <span className="pd-breadcrumb-current">{producto.nombre}</span>
+      </div>
+
+      <div className="pd-layout">
+        <div className="pd-gallery">
+          <div className="pd-thumbs">
+            {imagenes.length > 0 ? (
+              imagenes.map((img, index) => (
+                <button
+                  key={img.id}
+                  className={`pd-thumb${index === imagenActiva ? ' active' : ''}`}
+                  onClick={() => setImagenActiva(index)}
+                >
+                  <img src={getImagenUrl(producto.id, img.id)} alt={`${producto.nombre} ${index + 1}`} />
+                </button>
+              ))
+            ) : (
+              <div className="pd-thumb active">
+                <div className="pd-img-placeholder" aria-hidden="true">🎂</div>
+              </div>
+            )}
+          </div>
+
+          <div className="pd-main-image">
+            {imagenes.length > 0 ? (
+              <img src={getImagenUrl(producto.id, imagenes[imagenActiva].id)} alt={producto.nombre} />
+            ) : (
+              <div className="pd-img-placeholder pd-img-placeholder-main" aria-hidden="true">🎂</div>
+            )}
+          </div>
         </div>
 
- 
-      <h2 style={{ marginTop: '20px' }}>{producto.nombre}</h2>
-      <p style={{ fontSize: '18px', color: '#555', margin: '15px 0' }}>{producto.descripcion}</p>
-      <p style={{ fontSize: '24px', fontWeight: 'bold' }}>${producto.precio}</p>
- 
-      {/* Mostramos el stock solo si el backend lo manda */}
-      {producto.stock !== undefined && (
-        <p>Stock disponible: {producto.stock} unidades</p>
-      )}
- 
-      {/* Botón con feedback visual: cambia color y texto al hacer click */}
-      <button
-        onClick={handleAgregarAlCarrito}
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          background: agregado ? '#4CAF50' : '#aa3bff', // Verde si ya lo agregó
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          width: '100%',
-          fontSize: '16px',
-          transition: 'background 0.3s'
-        }}
-      >
-        {agregado ? '✓ Agregado al carrito' : 'Agregar al Carrito'}
-      </button>
+        <div className="pd-info">
+          <button className="pd-hecho-con-amor" onClick={handleToggleFavorite}>
+            <img src={esFavorito ? faheart : faheartn} alt="" className="pd-heart-icon" />
+            HECHO CON AMOR, TODOS LOS DÍAS
+          </button>
+
+          <h1 className="pd-title">{producto.nombre}</h1>
+          <p className="pd-price">${producto.precio.toLocaleString('es-AR')}</p>
+
+          <div className="pd-availability">
+            <span className="dot"></span> {sinStock ? 'Sin stock' : 'Disponible hoy'}
+          </div>
+
+          <p className="pd-description">{producto.descripcion}</p>
+
+          <div className="pd-purchase-row">
+            <div>
+              <p className="pd-label">Cantidad</p>
+              <div className="pd-qty-selector">
+                <button type="button" onClick={() => setCantidad((c) => Math.max(1, c - 1))} disabled={cantidad <= 1}>−</button>
+                <span>{cantidad}</span>
+                <button
+                  type="button"
+                  onClick={() => setCantidad((c) => Math.min(disponibleParaAgregar || 1, c + 1))}
+                  disabled={cantidad >= disponibleParaAgregar}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <button type="button" className="pd-dedicatoria" title="Próximamente disponible">
+              <span aria-hidden="true">🌿</span>
+              <span>
+                <strong>Agregar dedicatoria</strong>
+                <small>Sorprendé con un mensaje especial</small>
+              </span>
+              <span aria-hidden="true">›</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className="pd-btn-primary"
+            onClick={handleAgregarAlCarrito}
+            disabled={sinStock || disponibleParaAgregar <= 0}
+          >
+            🛒 {sinStock || disponibleParaAgregar <= 0 ? 'Sin stock disponible' : 'Agregar al carrito'}
+          </button>
+
+          <button
+            type="button"
+            className="pd-btn-secondary"
+            onClick={handleComprarAhora}
+            disabled={sinStock || disponibleParaAgregar <= 0}
+          >
+            📦 Comprar ahora
+          </button>
+        </div>
+      </div>
+
+      <div className="features-section">
+        <div className="feature-item">
+          <img src={enviosIcon} alt="Envíos en el día" className="feature-icon" />
+          <div className="feature-text">
+            <h4>Envíos en el día</h4>
+            <p>Recibí tu pedido rápido y fresco.</p>
+          </div>
+        </div>
+        <div className="feature-divider"></div>
+
+        <div className="feature-item">
+          <img src={productosIcon} alt="Productos frescos" className="feature-icon" />
+          <div className="feature-text">
+            <h4>Productos frescos</h4>
+            <p>Elaboramos todos los días.</p>
+          </div>
+        </div>
+        <div className="feature-divider"></div>
+
+        <div className="feature-item">
+          <img src={pedidosIcon} alt="Pedidos personalizados" className="feature-icon" />
+          <div className="feature-text">
+            <h4>Pedidos personalizados</h4>
+            <p>Tortas y box a tu medida.</p>
+          </div>
+        </div>
+        <div className="feature-divider"></div>
+
+        <div className="feature-item">
+          <img src={retiroIcon} alt="Retiro en tienda" className="feature-icon" />
+          <div className="feature-text">
+            <h4>Retiro en tienda</h4>
+            <p>Pasá a buscar tu pedido.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
- 
+
 export default ProductDetail;

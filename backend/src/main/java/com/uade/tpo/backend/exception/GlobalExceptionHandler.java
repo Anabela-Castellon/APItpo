@@ -34,4 +34,12 @@ public ResponseEntity<Object> handleEmailAlreadyExists(EmailAlreadyExistsExcepti
     body.put("mensaje", ex.getMessage());
     return new ResponseEntity<>(body, HttpStatus.CONFLICT); // 409
 }
+
+@ExceptionHandler(InvalidClaveMaestraException.class)
+public ResponseEntity<Object> handleInvalidClaveMaestra(InvalidClaveMaestraException ex) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("error", "Clave maestra inválida");
+    body.put("mensaje", ex.getMessage());
+    return new ResponseEntity<>(body, HttpStatus.FORBIDDEN); // 403
+}
 }

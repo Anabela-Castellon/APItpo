@@ -15,4 +15,5 @@ public class RegistrationRequestDTO {
     private String dni;
     private String telefono;
     private String direccion;
+    private String claveMaestra;
 }

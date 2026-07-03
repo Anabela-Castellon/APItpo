@@ -34,26 +34,25 @@ export function CartProvider({ children }) {
   // Cada item tiene los datos del producto + una propiedad "quantity" (cantidad).
   const [cartItems, setCartItems] = useState([]);
  
-  // Agrega un producto al carrito.
+  // Agrega un producto al carrito, respetando el stock disponible.
   // Si el producto ya estaba, aumenta la cantidad en vez de duplicarlo.
-  const addToCart = (product) => {
+  const addToCart = (product, cantidad = 1) => {
+    const stockMax = product.stock ?? Infinity;
+
     setCartItems(prevItems => {
       const existe = prevItems.find(item => item.id === product.id);
- 
+
       if (existe) {
-        // Ya estaba: le sumamos 1 a la cantidad
+        const nuevaCantidad = Math.min(existe.quantity + cantidad, stockMax);
         return prevItems.map(item =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: nuevaCantidad }
             : item
         );
       }
- 
-      // No estaba: lo agregamos con quantity = 1
-      return [...prevItems, { ...product, quantity: 1 }];
+
+      return [...prevItems, { ...product, quantity: Math.min(cantidad, stockMax) }];
     });
- 
-    console.log(`${product.nombre} agregado al carrito!`);
   };
  
   // Elimina un producto del carrito completamente (sin importar la cantidad).
@@ -70,7 +69,9 @@ export function CartProvider({ children }) {
     }
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item.id === productId ? { ...item, quantity: nuevaCantidad } : item
+        item.id === productId
+          ? { ...item, quantity: Math.min(nuevaCantidad, item.stock ?? Infinity) }
+          : item
       )
     );
   };

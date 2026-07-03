@@ -43,7 +43,7 @@ public class ImagenController {
     }
 
     // URL: GET http://localhost:8080/api/productos/1/imagenes/1
-    @GetMapping("/{productoId}/imagenes/{id}")
+    @GetMapping("productos/{productoId}/imagenes/{id}")
     public ResponseEntity<byte[]> getImagen(
             @PathVariable Long productoId, // Path variable for consistency
             @PathVariable Long id) {
@@ -127,7 +127,7 @@ public class ImagenController {
     }
     
     // URL: DELETE http://localhost:8080/api/productos/1/imagenes/1
-    @DeleteMapping("/{productoId}/imagenes/{id}")
+    @DeleteMapping("productos/{productoId}/imagenes/{id}")
     public ResponseEntity<?> deleteImagen(
             @PathVariable Long productoId,
             @PathVariable Long id) {

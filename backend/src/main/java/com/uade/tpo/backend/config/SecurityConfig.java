@@ -62,8 +62,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/consultas").permitAll()
                 // ── Rutas de carrito: solo usuarios autenticados ────────────
                 .requestMatchers("/api/carritos/**").hasAnyRole(Rol.CONSUMIDOR.name(), Rol.ADMIN.name())
+
+                // ── Gestión de consultas: solo ADMIN ────────────────────────
+                .requestMatchers("/api/consultas/**").hasRole(Rol.ADMIN.name())
  
                 // ── Gestión de productos: solo VENDEDOR o ADMIN ─────────────
                 .requestMatchers(HttpMethod.POST,   "/api/productos").hasAnyRole(Rol.VENDEDOR.name(), Rol.ADMIN.name())

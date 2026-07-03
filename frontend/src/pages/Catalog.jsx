@@ -1,105 +1,156 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ProductCard from '../components/ProductCard';
+import { apiFetch } from '../services/api';
 
-// Importaciones actualizadas según tu VS Code (png y svg)
 import bannerImage from '../assets/bannerCatProduct.png';
-import iconTodos from '../assets/todos.svg';
-import iconPanificados from '../assets/panificados.svg'; 
-import iconTortas from '../assets/tortas.svg';
-import iconCafes from '../assets/cafes.svg';
-import iconBebidas from '../assets/bebidas.svg';
-import iconCombos from '../assets/combos.svg';
-import iconPromos from '../assets/promos.svg';
-
-// Iconos del footer de beneficios
 import enviosIcon from '../assets/envios.png';
 import productosIcon from '../assets/productoss.png';
 import pedidosIcon from '../assets/pedidoss.png';
 import retiroIcon from '../assets/retiro.png';
+import { normalizar, iconosPorCategoria, iconTodos, ordenarCategorias } from '../utils/categoriaIcons';
 
 import '../styles/catalog.css';
 
+const initialFiltros = {
+  categoriaId: '',
+  minPrice: '',
+  maxPrice: '',
+  soloDisponibles: false,
+  sortBy: 'relevancia',
+};
+
 const Catalog = () => {
+  const [searchParams] = useSearchParams();
   const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [filtros, setFiltros] = useState(initialFiltros);
 
   useEffect(() => {
-    const fetchProductos = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8080/api/productos', {
-          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        });
+    const q = searchParams.get('q');
+    if (q !== null) setSearch(q);
+  }, [searchParams]);
 
-        if (response.ok) {
-          const data = await response.json();
-          setProductos(data);
-        }
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const [productosData, categoriasData] = await Promise.all([
+          apiFetch('/productos'),
+          apiFetch('/categorias'),
+        ]);
+        setProductos(productosData || []);
+        setCategorias(ordenarCategorias(categoriasData || []));
       } catch (error) {
-        console.error('Error fetching productos:', error);
+        console.error('Error fetching catálogo:', error);
       } finally {
         setCargando(false);
       }
     };
 
-    fetchProductos();
+    cargarDatos();
   }, []);
 
+  const productosFiltrados = useMemo(() => {
+    let resultado = [...productos];
+
+    if (search.trim()) {
+      const term = normalizar(search.trim());
+      resultado = resultado.filter((p) => normalizar(p.nombre).includes(term));
+    }
+
+    if (filtros.categoriaId) {
+      resultado = resultado.filter((p) =>
+        (p.categorias || []).some((c) => String(c.id) === filtros.categoriaId)
+      );
+    }
+
+    if (filtros.minPrice !== '') {
+      resultado = resultado.filter((p) => p.precio >= Number(filtros.minPrice));
+    }
+
+    if (filtros.maxPrice !== '') {
+      resultado = resultado.filter((p) => p.precio <= Number(filtros.maxPrice));
+    }
+
+    if (filtros.soloDisponibles) {
+      resultado = resultado.filter((p) => (p.stock ?? 0) > 0);
+    }
+
+    if (filtros.sortBy === 'precio-asc') {
+      resultado.sort((a, b) => a.precio - b.precio);
+    } else if (filtros.sortBy === 'precio-desc') {
+      resultado.sort((a, b) => b.precio - a.precio);
+    }
+
+    return resultado;
+  }, [productos, search, filtros]);
+
+  const handleClear = () => {
+    setSearch('');
+    setFiltros(initialFiltros);
+  };
+
   return (
-    <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
-      
-      {/* Banner Principal */}
+    <div className="page-container">
+
       <div className="catalog-banner">
         <img src={bannerImage} alt="Banner Catálogo" />
       </div>
 
-      {/* Navegación de Categorías */}
       <div className="category-pills">
-        <button className="pill active">
+        <button
+          className={`pill${filtros.categoriaId === '' ? ' active' : ''}`}
+          onClick={() => setFiltros((f) => ({ ...f, categoriaId: '' }))}
+        >
           <img src={iconTodos} alt="Todos" /> Todos
         </button>
-        <button className="pill">
-          <img src={iconPanificados} alt="Panificados" /> Panificados
-        </button>
-        <button className="pill">
-          <img src={iconTortas} alt="Tortas" /> Tortas
-        </button>
-        <button className="pill">
-          <img src={iconCafes} alt="Cafés" /> Cafés
-        </button>
-        <button className="pill">
-          <img src={iconBebidas} alt="Bebidas" /> Bebidas
-        </button>
-        {/* Agregamos los que faltaban */}
-        <button className="pill">
-          <img src={iconCombos} alt="Combos" /> Combos
-        </button>
-        <button className="pill">
-          <img src={iconPromos} alt="Promos" /> Promos
-        </button>
+        {categorias.map((cat) => (
+          <button
+            key={cat.id}
+            className={`pill${filtros.categoriaId === String(cat.id) ? ' active' : ''}`}
+            onClick={() => setFiltros((f) => ({ ...f, categoriaId: String(cat.id) }))}
+          >
+            <img src={iconosPorCategoria[normalizar(cat.nombre)] || iconTodos} alt={cat.nombre} /> {cat.nombre}
+          </button>
+        ))}
       </div>
 
-      {/* Contenido Principal */}
       <div className="catalog-layout">
-        <Sidebar />
-        
+        <Sidebar
+          search={search}
+          onSearchChange={setSearch}
+          categorias={categorias}
+          categoriaId={filtros.categoriaId}
+          onCategoriaChange={(categoriaId) => setFiltros((f) => ({ ...f, categoriaId }))}
+          minPrice={filtros.minPrice}
+          maxPrice={filtros.maxPrice}
+          onMinPriceChange={(minPrice) => setFiltros((f) => ({ ...f, minPrice }))}
+          onMaxPriceChange={(maxPrice) => setFiltros((f) => ({ ...f, maxPrice }))}
+          soloDisponibles={filtros.soloDisponibles}
+          onSoloDisponiblesChange={(soloDisponibles) => setFiltros((f) => ({ ...f, soloDisponibles }))}
+          sortBy={filtros.sortBy}
+          onSortByChange={(sortBy) => setFiltros((f) => ({ ...f, sortBy }))}
+          onClear={handleClear}
+        />
+
         <div className="product-grid">
           {cargando ? (
             <p>Cargando productos...</p>
-          ) : productos.length > 0 ? (
-            productos.map(prod => (
+          ) : productosFiltrados.length > 0 ? (
+            productosFiltrados.map(prod => (
               <ProductCard key={prod.id} product={prod} />
             ))
           ) : (
             <p style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "2rem" }}>
-              No hay productos disponibles por el momento.
+              No se encontraron productos con esos filtros.
             </p>
           )}
         </div>
       </div>
 
-      {/* Footer de Beneficios */}
       <div className="features-section">
         <div className="feature-item">
           <img src={enviosIcon} alt="Envíos en el día" className="feature-icon" />
@@ -109,7 +160,7 @@ const Catalog = () => {
           </div>
         </div>
         <div className="feature-divider"></div>
-        
+
         <div className="feature-item">
           <img src={productosIcon} alt="Productos frescos" className="feature-icon" />
           <div className="feature-text">

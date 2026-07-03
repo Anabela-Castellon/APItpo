@@ -25,7 +25,9 @@ const Register = () => {
     apellido: '',
     dni: '',
     telefono: '',
-    direccion: ''
+    direccion: '',
+    rol: 'COMPRADOR',
+    claveMaestra: ''
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -51,11 +53,18 @@ const Register = () => {
       apellido: form.apellido,
       dni: form.dni,
       telefono: form.telefono,
-      direccion: form.direccion
+      direccion: form.direccion,
+      claveMaestra: form.claveMaestra
+    };
+
+    const endpointPorRol = {
+      COMPRADOR: '/api/auth/register',
+      VENDEDOR: '/api/auth/register/vendedor',
+      ADMIN: '/api/auth/register/admin'
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
+      const response = await fetch(`http://localhost:8080${endpointPorRol[form.rol]}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -155,6 +164,30 @@ const Register = () => {
                   />
                 </div>
               </div>
+
+              <div className="register-input-group">
+                <label htmlFor="rol">Tipo de cuenta</label>
+                <select id="rol" name="rol" value={form.rol} onChange={handleChange} required>
+                  <option value="COMPRADOR">Comprador</option>
+                  <option value="VENDEDOR">Vendedor</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+
+              {form.rol === 'ADMIN' && (
+                <div className="register-input-group">
+                  <label htmlFor="claveMaestra">Clave maestra de administrador</label>
+                  <input
+                    id="claveMaestra"
+                    name="claveMaestra"
+                    type="password"
+                    placeholder="Ingresá la clave maestra"
+                    value={form.claveMaestra}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              )}
 
               <div className="register-input-group">
                 <label htmlFor="direccion">Dirección</label>

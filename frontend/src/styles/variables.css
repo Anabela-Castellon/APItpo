@@ -14,3 +14,12 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   margin: 0;
 }
+
+/* Ancho estándar de las vistas de cliente (Inicio, Catálogo, Detalle de producto) */
+.page-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  box-sizing: border-box;
+}
