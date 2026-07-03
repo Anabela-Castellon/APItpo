@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'; // Added useSelector
 import { loginUser } from '../store/authSlice';
 
 import trigoLogo from '../assets/trigoLogo.png';
@@ -16,6 +16,10 @@ import '../styles/login.css';
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // 1. Pull loading and error states from authSlice
+  const { loading, error: serverError } = useSelector((state) => state.auth);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -24,11 +28,16 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      await dispatch(loginUser({ email, password })).unwrap();
+      // 2. Unwrap the result to get the raw token returned by the fulfilled action
+      const token = await dispatch(loginUser({ email, password })).unwrap();
+      
+      // 3. Save the token to localStorage so it persists on page refreshes
+      localStorage.setItem('token', token);
+      
       navigate('/');
     } catch (error) {
+      // The error here is what rejectWithValue sent from the slice
       console.error('Error al conectar con el backend:', error);
-      alert('Credenciales incorrectas');
     }
   };
 
@@ -47,6 +56,9 @@ const Login = () => {
 
             <h2 className="login-title">Iniciar Sesion</h2>
 
+            {/* 4. Display the server error message if it exists */}
+            {serverError && <div className="login-error-message">{serverError}</div>}
+
             <form onSubmit={handleLogin} className="login-form">
               <div className="input-group">
                 <label htmlFor="email">Mail</label>
@@ -57,6 +69,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={loading} // Disable input while loading
                 />
               </div>
 
@@ -70,12 +83,14 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={loading} // Disable input while loading
                   />
                   <button
                     type="button"
                     className="toggle-password-btn"
                     onClick={togglePasswordVisibility}
                     aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                    disabled={loading}
                   >
                     {showPassword ? (
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -92,7 +107,10 @@ const Login = () => {
                 </div>
               </div>
 
-              <button type="submit" className="login-btn">Ingresar</button>
+              {/* 5. Disable button and update text while waiting for response */}
+              <button type="submit" className="login-btn" disabled={loading}>
+                {loading ? 'Ingresando...' : 'Ingresar'}
+              </button>
             </form>
 
             <p className="login-footer-text">
