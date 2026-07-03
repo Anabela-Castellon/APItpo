@@ -10,6 +10,7 @@ const navItems = [
   { to: '/admin/categorias', icon: '🏷️', label: 'Categorías' },
   { to: '/admin/usuarios', icon: '👥', label: 'Usuarios' },
   { to: '/admin/clientes', icon: '👤', label: 'Clientes' },
+  { to: '/admin/consultas', icon: '✉️', label: 'Consultas' },
   { to: '/admin/inventario', icon: '📦', label: 'Inventario' },
   { to: '/admin/promociones', icon: '🏷️', label: 'Promociones' },
   { to: '/admin/reportes', icon: '📊', label: 'Reportes' },

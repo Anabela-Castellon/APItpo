@@ -18,7 +18,9 @@ import Perfil from "./pages/Perfil";
 import MisPedidos from "./pages/MisPedidos";
 import Favoritos from "./pages/Favoritos";
 import Nosotros from "./pages/Nosotros";
+import Contacto from "./pages/Contacto";
 import AdminProductos from "./pages/admin/AdminProductos";
+import AdminConsultas from "./pages/admin/AdminConsultas";
 import AdminPlaceholder from "./pages/admin/AdminPlaceholder";
 
 const RequireAuth = ({ children }) => {
@@ -38,6 +40,7 @@ const AppLayout = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/productos" element={<Catalog />} />
                 <Route path="/nosotros" element={<Nosotros />} />
+                <Route path="/contacto" element={<Contacto />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductDetail />} />
@@ -54,6 +57,7 @@ const AppLayout = () => {
                 <Route path="/admin/categorias" element={<AdminPlaceholder title="Categorías" />} />
                 <Route path="/admin/usuarios" element={<AdminPlaceholder title="Usuarios" />} />
                 <Route path="/admin/clientes" element={<AdminPlaceholder title="Clientes" />} />
+                <Route path="/admin/consultas" element={<AdminConsultas />} />
                 <Route path="/admin/inventario" element={<AdminPlaceholder title="Inventario" />} />
                 <Route path="/admin/promociones" element={<AdminPlaceholder title="Promociones" />} />
                 <Route path="/admin/reportes" element={<AdminPlaceholder title="Reportes" />} />

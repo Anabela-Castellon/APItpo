@@ -273,17 +273,20 @@
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 .admin-page-header h2 {
   margin: 0 0 0.25rem;
   color: var(--color-marron);
+  text-align: left;
 }
 
 .admin-page-subtitle {
   margin: 0;
   color: #888;
   font-size: 0.9rem;
+  text-align: left;
 }
 
 .admin-card {
@@ -422,6 +425,38 @@
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.admin-badge-pendiente {
+  background-color: rgba(230, 180, 90, 0.2);
+  color: #b8860b;
+}
+
+.admin-badge-respondida {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: var(--color-verde-ok);
+}
+
+.admin-badge-cerrada {
+  background-color: rgba(76, 45, 16, 0.1);
+  color: rgba(76, 45, 16, 0.6);
+}
+
+.admin-consulta-mensaje {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-estado-select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-borde);
+  background-color: #fff;
+  color: var(--color-marron);
+  font-family: inherit;
+  font-size: 0.8rem;
 }
 
 .admin-empty {
