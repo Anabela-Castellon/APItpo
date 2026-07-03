@@ -15,7 +15,7 @@ const PerfilLayout = ({ children }) => {
     }, [isLoggedIn, navigate]);
 
     return (
-        <div className="perfil-container">
+        <div className="page-container perfil-container">
             <PerfilSidebar />
             <main className="perfil-content">{children}</main>
         </div>

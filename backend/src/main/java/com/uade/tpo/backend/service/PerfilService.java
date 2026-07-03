@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.backend.dto.PerfilMeDTO;
 import com.uade.tpo.backend.dto.PerfilResponseDTO;
 import com.uade.tpo.backend.model.Perfil;
 import com.uade.tpo.backend.model.Usuario;
@@ -72,6 +73,43 @@ public class PerfilService {
         .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
 
     return mapToDTO(perfil);
+  }
+
+  // GET PROPIO (a partir del email del token) //
+  public PerfilMeDTO obtenerPerfilPropio(String email) {
+    Usuario usuario = usuarioRepository.findByEmail(email)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    Perfil perfil = perfilRepository.findByUsuarioId(usuario.getId())
+        .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
+
+    return mapToMeDTO(perfil, usuario);
+  }
+
+  // UPDATE PROPIO //
+  public PerfilMeDTO actualizarPerfilPropio(String email, PerfilMeDTO datos) {
+    Usuario usuario = usuarioRepository.findByEmail(email)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    Perfil perfil = perfilRepository.findByUsuarioId(usuario.getId())
+        .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
+
+    perfil.setNombre(datos.getNombre());
+    perfil.setApellido(datos.getApellido());
+    perfil.setTelefono(datos.getTelefono());
+    perfil.setDireccion(datos.getDireccion());
+    perfilRepository.save(perfil);
+
+    return mapToMeDTO(perfil, usuario);
+  }
+
+  private PerfilMeDTO mapToMeDTO(Perfil perfil, Usuario usuario) {
+    PerfilMeDTO dto = new PerfilMeDTO();
+    dto.setId(perfil.getId());
+    dto.setNombre(perfil.getNombre());
+    dto.setApellido(perfil.getApellido());
+    dto.setTelefono(perfil.getTelefono());
+    dto.setDireccion(perfil.getDireccion());
+    dto.setEmail(usuario.getEmail());
+    return dto;
   }
 
   private PerfilResponseDTO mapToDTO(Perfil perfil) {

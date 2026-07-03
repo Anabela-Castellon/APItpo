@@ -2,8 +2,10 @@ package com.uade.tpo.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import com.uade.tpo.backend.dto.PerfilMeDTO;
 import com.uade.tpo.backend.model.Perfil;
 import com.uade.tpo.backend.service.PerfilService;
 
@@ -50,6 +52,26 @@ public class PerfilController {
   public ResponseEntity<?> delete(@PathVariable Long id) {
     perfilService.eliminarPerfil(id);
     return ResponseEntity.noContent().build();
+  }
+
+  // GET MI PERFIL (a partir del token) //
+  @GetMapping("/me")
+  public ResponseEntity<?> obtenerMiPerfil(Authentication authentication) {
+    try {
+      return ResponseEntity.ok(perfilService.obtenerPerfilPropio(authentication.getName()));
+    } catch (RuntimeException e) {
+      return ResponseEntity.status(404).body(e.getMessage());
+    }
+  }
+
+  // UPDATE MI PERFIL //
+  @PutMapping("/me")
+  public ResponseEntity<?> actualizarMiPerfil(Authentication authentication, @RequestBody PerfilMeDTO datos) {
+    try {
+      return ResponseEntity.ok(perfilService.actualizarPerfilPropio(authentication.getName(), datos));
+    } catch (RuntimeException e) {
+      return ResponseEntity.status(404).body(e.getMessage());
+    }
   }
 
   // GET POR USUARIO (PRO) //
