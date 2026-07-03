@@ -1,10 +1,11 @@
+import bannerNosotros from "../assets/NosotrosBannerSuperior.png";
 import "../styles/nosotrosBanner.css";
 
 const NosotrosBannerSuperior = () => {
   return (
     <div className="nosotros-banner-container">
       <img
-        src="/src/assets/NosotrosBannerSuperior.png"
+        src={bannerNosotros}
         alt="Banner Nosotros"
         className="nosotros-banner-image"
       />

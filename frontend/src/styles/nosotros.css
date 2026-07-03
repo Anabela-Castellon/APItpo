@@ -1,34 +1,31 @@
 .nosotros-page {
-  min-height: 100vh;
-  background-color: #f9f7f4;
+  text-align: left;
 }
 
 /* Historia Section */
 .historia-section {
-  padding: 80px 20px;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 2.5rem 0;
 }
 
 .historia-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  gap: 3rem;
   align-items: center;
 }
 
 .historia-content h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #3d3d3d;
-  margin-bottom: 20px;
+  color: var(--color-marron);
+  margin-bottom: 1.25rem;
   text-align: left;
 }
 
 .historia-content p {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: #666;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(76, 45, 16, 0.8);
   text-align: left;
 }
 
@@ -39,44 +36,48 @@
 
 .historia-image {
   width: 100%;
-  max-width: 420px;
   height: auto;
-  border-radius: 12px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
 }
-
 
 /* Equipo Section */
 .equipo-section {
-  padding: 80px 20px;
   background-color: #fff;
-  max-width: 900px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: 3rem 2rem;
+  margin: 1rem 0 2.5rem;
+}
+
+.equipo-content {
+  max-width: 700px;
   margin: 0 auto;
+  text-align: center;
 }
 
 .equipo-content h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #3d3d3d;
-  margin-bottom: 20px;
-  text-align: center;
+  color: var(--color-marron);
+  margin-bottom: 1rem;
 }
 
 .equipo-content p {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: #666;
-  text-align: center;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(76, 45, 16, 0.8);
 }
 
 @media (max-width: 768px) {
   .historia-section,
   .equipo-section {
-    padding: 50px 15px;
+    padding: 2rem 1.25rem;
   }
 
   .historia-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 1.5rem;
   }
 
   .historia-content h2,
@@ -88,10 +89,4 @@
   .equipo-content p {
     font-size: 0.95rem;
   }
-
-  .historia-content h2,
-  .historia-content p {
-    text-align: center;
-  }
 }
-

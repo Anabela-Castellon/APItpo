@@ -4,7 +4,7 @@ import "../styles/nosotros.css";
 
 const Nosotros = () => {
   return (
-    <div className="nosotros-page">
+    <div className="page-container nosotros-page">
       <NosotrosBannerSuperior />
 
       <section id="nuestra-historia" className="historia-section">
