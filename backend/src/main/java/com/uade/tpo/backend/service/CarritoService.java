@@ -57,16 +57,19 @@ public class CarritoService {
     Producto producto = productoRepository.findById(productoId)
         .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-    // Validar stock disponible en la tabla maestra de Productos
-    if (producto.getStock() < cantidad) {
-      throw new InsufficientStockException(
-          "Solo quedan " + producto.getStock() + " unidades de " + producto.getNombre());
-    }
-
     // Buscar si el producto ya está en el carrito para no duplicar filas
     Optional<ItemCarrito> itemExistente = carrito.getProductos().stream()
         .filter(item -> item.getProducto().getId().equals(productoId))
         .findFirst();
+
+    // Validar stock disponible en la tabla maestra de Productos, considerando
+    // la cantidad que ya estaba en el carrito (no solo la que se agrega ahora)
+    int cantidadActual = itemExistente.map(ItemCarrito::getCantidad).orElse(0);
+    int cantidadFinal = cantidadActual + cantidad;
+    if (cantidadFinal > producto.getStock()) {
+      throw new InsufficientStockException(
+          "Solo quedan " + producto.getStock() + " unidades de " + producto.getNombre());
+    }
 
     if (itemExistente.isPresent()) {
       // Si ya existe, aumentamos la cantidad en el item intermedio

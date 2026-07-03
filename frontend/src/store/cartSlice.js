@@ -47,6 +47,18 @@ export const removeProductoFromCart = createAsyncThunk(
   }
 );
 
+// POST /api/carritos/{id}/checkout
+export const checkoutCart = createAsyncThunk(
+  'cart/checkout',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await apiFetch(`/carritos/${getCarritoId()}/checkout`, { method: 'POST' });
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
 // DELETE /api/carritos/{id}/vaciar
 export const clearCartApi = createAsyncThunk(
   'cart/clearCart',
@@ -108,6 +120,19 @@ const cartSlice = createSlice({
       .addCase(clearCartApi.fulfilled, (state, action) => {
         state.items = action.payload?.productos || [];
         state.total = action.payload?.precioTotal || 0;
+      })
+      // checkoutCart
+      .addCase(checkoutCart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkoutCart.fulfilled, (state) => {
+        state.loading = false;
+        state.items = [];
+        state.total = 0;
+      })
+      .addCase(checkoutCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

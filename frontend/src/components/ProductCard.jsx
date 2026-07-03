@@ -22,8 +22,9 @@ const ProductCard = ({ product }) => {
     );
 
     // Buscamos la cantidad actual que hay de este producto en el carrito
-    const enCarrito = cartItems.find((item) => item.id === product.id)?.cantidad || 
-                      cartItems.find((item) => item.id === product.id)?.quantity || 0;
+    // (item.producto.id es el producto real; item.id es el id del ItemCarrito)
+    const itemEnCarrito = cartItems.find((item) => (item.producto?.id ?? item.id) === product.id);
+    const enCarrito = itemEnCarrito?.cantidad ?? itemEnCarrito?.quantity ?? 0;
                       
     const sinStock = product.stock !== undefined && product.stock <= 0;
     const alcanzoLimite = product.stock !== undefined && enCarrito >= product.stock;
