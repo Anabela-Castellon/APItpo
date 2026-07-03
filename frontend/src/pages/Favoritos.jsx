@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PerfilLayout from '../components/PerfilLayout';
 import ProductCard from '../components/ProductCard';
 
+// Página de favoritos: lista los productos guardados por el usuario (persistidos en localStorage)
 const Favoritos = () => {
     const favoritos = useSelector((state) => state.favoritos.items);
 

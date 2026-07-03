@@ -61,6 +61,7 @@ const SendIcon = () => (
 
 const emptyForm = { nombre: '', email: '', asunto: '', mensaje: '' };
 
+// Página de contacto: datos de la tienda + formulario que crea una Consulta en el backend
 const Contacto = () => {
   const dispatch = useDispatch();
   const { enviando } = useSelector((state) => state.consultas);
@@ -74,6 +75,7 @@ const Contacto = () => {
     setError('');
   };
 
+  // Envía la consulta y resetea el formulario si sale bien
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.nombre || !form.email || !form.mensaje) return;

@@ -5,12 +5,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { checkoutCart } from '../store/cartSlice';
 
+// Página de confirmación de compra: muestra el resumen del carrito y dispara el checkout contra la API
 const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items: cartItems, total, loading, error } = useSelector((state) => state.cart);
   const [confirmando, setConfirmando] = useState(false);
 
+  // Confirma la compra; si sale bien vacía el carrito (en el slice) y vuelve al home
   const handleConfirmar = async () => {
     setConfirmando(true);
     const result = await dispatch(checkoutCart());

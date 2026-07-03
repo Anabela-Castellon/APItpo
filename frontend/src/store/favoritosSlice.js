@@ -5,10 +5,12 @@ const initialState = {
     items: JSON.parse(localStorage.getItem('favoritos')) || [],
 };
 
+// Slice de favoritos: no depende del backend, se persiste directo en localStorage
 const favoritosSlice = createSlice({
     name: 'favoritos',
     initialState,
     reducers: {
+        // Agrega o quita un producto de favoritos según si ya estaba en la lista
         toggleFavorito: (state, action) => {
             const producto = action.payload;
             const existe = state.items.find(item => item.id === producto.id);

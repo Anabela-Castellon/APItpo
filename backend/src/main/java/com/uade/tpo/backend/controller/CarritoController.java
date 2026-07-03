@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.backend.model.Carrito;
 import com.uade.tpo.backend.service.CarritoService;
 
+// Controlador del carrito de compras: acceso restringido a usuarios autenticados
 @RestController
 @RequestMapping("/api/carritos")
 public class CarritoController {
@@ -23,13 +24,13 @@ public class CarritoController {
   @Autowired
   private CarritoService carritoService;
 
-  // 1. Get all carts
+  // 1. Devuelve todos los carritos existentes
   @GetMapping
   public List<Carrito> getAllCarritos() {
     return carritoService.findAll();
   }
 
-  // 2. Get a specific cart by ID
+  // 2. Devuelve un carrito puntual por id (404 si no existe)
   @GetMapping("/{id}")
   public ResponseEntity<Carrito> getCarritoById(@PathVariable Long id) {
     return carritoService.findById(id)
@@ -37,7 +38,7 @@ public class CarritoController {
         .orElse(ResponseEntity.notFound().build());
   }
 
-  // 3. Add a product to a cart
+  // 3. Agrega un producto al carrito (o suma cantidad si ya estaba)
   // Path example: POST /api/carritos/1/productos/5
   @PostMapping("/{carritoId}/productos/{productoId}")
   public ResponseEntity<?> addProducto(
@@ -53,7 +54,7 @@ public class CarritoController {
     }
   }
 
-  // 4. Checkout del carrito
+  // 4. Confirma la compra: descuenta stock y vacía el carrito
   @PostMapping("/{id}/checkout")
   public ResponseEntity<String> checkout(@PathVariable Long id) {
     try {
@@ -64,13 +65,13 @@ public class CarritoController {
     }
   }
 
-  // 5. Remove a product from a cart
+  // 5. Quita un producto puntual del carrito
   @DeleteMapping("/{carritoId}/productos/{productoId}")
   public ResponseEntity<Carrito> removeProducto(@PathVariable Long carritoId, @PathVariable Long productoId) {
     return ResponseEntity.ok(carritoService.removeProductoFromCarrito(carritoId, productoId));
   }
 
-  // 6. elimina el carrito completo (no solo vaciarlo)
+  // 6. Elimina el carrito completo (no solo vaciarlo)
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteCarrito(@PathVariable Long id) {
     carritoService.delete(id);

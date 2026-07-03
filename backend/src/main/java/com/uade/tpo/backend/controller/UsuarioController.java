@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.backend.model.Usuario;
 import com.uade.tpo.backend.service.UsuarioService;
  
+// Controlador de gestión de usuarios (listar, ver, eliminar, dar de alta/baja): todo restringido a ADMIN
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
@@ -47,6 +48,7 @@ public class UsuarioController {
     return ResponseEntity.noContent().build();
   }
   
+  // Reactiva a un usuario dado de baja
   // PUT /api/usuarios/1/dar-de-alta
     @PutMapping("/{id}/alta")
     public ResponseEntity<String> darDeAlta(@PathVariable Long id) {
@@ -58,6 +60,7 @@ public class UsuarioController {
         }
     }
 
+    // Deshabilita a un usuario (queda "dado de baja", no puede loguearse)
     // PUT /api/usuarios/1/dar-de-baja
     @PutMapping("/{id}/baja")
     public ResponseEntity<String> darDeBaja(@PathVariable Long id) {

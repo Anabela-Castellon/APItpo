@@ -78,6 +78,7 @@ const initialState = {
   error: null,
 };
 
+// Slice del carrito: sincroniza items/total con el backend en cada operación (fetch, add, remove, checkout, vaciar)
 const cartSlice = createSlice({
   name: 'cart',
   initialState,

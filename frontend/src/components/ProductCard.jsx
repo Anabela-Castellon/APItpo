@@ -9,10 +9,11 @@ import faheartn from '../assets/heart-regular-full.svg';
 // Importamos la acción de Redux para agregar al carrito
 import { addProductoToCart } from '../store/cartSlice';
 
+// Tarjeta de producto (usada en Home, Catálogo y Favoritos): imagen, precio, favorito y agregar al carrito
 const ProductCard = ({ product }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
     // Traemos los items del carrito desde Redux en lugar del context
     const cartItems = useSelector((state) => state.cart.items) || [];
@@ -30,6 +31,7 @@ const ProductCard = ({ product }) => {
     const alcanzoLimite = product.stock !== undefined && enCarrito >= product.stock;
     const primeraImagen = product.imagenes?.[0];
 
+    // Alterna favorito; si no hay sesión, manda al login en vez de despachar la acción
     const handleToggleFavorite = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -42,6 +44,7 @@ const ProductCard = ({ product }) => {
         dispatch(toggleFavorito(product));
     };
 
+    // Agrega una unidad del producto al carrito (vía API)
     const handleAddToCart = () => {
         // Despachamos el thunk que le pega al endpoint POST
         dispatch(addProductoToCart({ productoId: product.id, cantidad: 1 }));

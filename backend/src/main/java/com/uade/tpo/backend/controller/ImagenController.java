@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.uade.tpo.backend.model.Imagen;
 import com.uade.tpo.backend.service.ImagenService;
 
+// Controlador de imágenes: sube/descarga/actualiza/borra imágenes de productos y de perfiles
 @RestController
 @RequestMapping("/api")
 public class ImagenController {
@@ -25,6 +26,7 @@ public class ImagenController {
     @Autowired
     private ImagenService imagenService;
 
+    // Sube (crea) una imagen asociada a un producto
     // URL: POST http://localhost:8080/api/productos/1/imagenes
     @PostMapping("productos/{productoId}/imagenes")
     public ResponseEntity<Imagen> uploadImagenProducto(
@@ -34,6 +36,7 @@ public class ImagenController {
                 .body(imagenService.uploadImagenProducto(file, productoId));
     }
 
+    // Sube (crea) una imagen asociada a un perfil (foto de usuario)
     @PostMapping("perfiles/{perfilId}/imagenes")
     public ResponseEntity<Imagen> uploadImagenPerfil(
             @RequestParam("file") MultipartFile file,
@@ -42,6 +45,7 @@ public class ImagenController {
                 .body(imagenService.uploadImagenPerfil(file, perfilId));
     }
 
+    // Devuelve los bytes de una imagen de producto, validando que pertenezca a ese producto
     // URL: GET http://localhost:8080/api/productos/1/imagenes/1
     @GetMapping("productos/{productoId}/imagenes/{id}")
     public ResponseEntity<byte[]> getImagen(
@@ -61,6 +65,7 @@ public class ImagenController {
                 .body(img.getData());
     }
 
+    // Devuelve los bytes de una imagen de perfil, validando que pertenezca a ese perfil
     @GetMapping("/perfiles/{perfilId}/imagenes/{id}")
     public ResponseEntity<byte[]> getImagenA(
             @PathVariable Long perfilId, // Path variable for consistency
@@ -94,6 +99,7 @@ public class ImagenController {
     }
     */
 
+    // Reemplaza el archivo de una imagen de producto ya existente
     @PutMapping("productos/{productoId}/imagenes/{id}")
     public ResponseEntity<Imagen> updateImagenProducto(
             @PathVariable Long productoId,
@@ -110,6 +116,7 @@ public class ImagenController {
         return ResponseEntity.ok(imagenService.updateImagenFile(id, file));
     }
 
+    // Reemplaza el archivo de una imagen de perfil ya existente
     @PutMapping("perfiles/{perfilId}/imagenes/{id}")
     public ResponseEntity<Imagen> updateImagenPerfil(
             @PathVariable Long perfilId,
@@ -126,6 +133,7 @@ public class ImagenController {
         return ResponseEntity.ok(imagenService.updateImagenFile(id, file));
     }
     
+    // Borra una imagen de producto, validando que pertenezca a ese producto
     // URL: DELETE http://localhost:8080/api/productos/1/imagenes/1
     @DeleteMapping("productos/{productoId}/imagenes/{id}")
     public ResponseEntity<?> deleteImagen(

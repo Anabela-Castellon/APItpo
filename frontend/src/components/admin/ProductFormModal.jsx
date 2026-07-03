@@ -6,14 +6,16 @@ import { deleteImagenProducto } from '../../store/productsSlice';
 const emptyForm = { nombre: '', descripcion: '', precio: '', stock: '', categoriaId: '' };
 const MAX_IMAGENES = 5;
 
+// Modal de alta/edición de un producto: datos básicos, categoría y subida de hasta 5 imágenes
 const ProductFormModal = ({ producto, categorias, saving, onClose, onSubmit }) => {
   const dispatch = useDispatch();
   const [form, setForm] = useState(emptyForm);
-  const [nuevasImagenes, setNuevasImagenes] = useState([]);
-  const [previews, setPreviews] = useState([]);
+  const [nuevasImagenes, setNuevasImagenes] = useState([]); // Files nuevos elegidos, aún sin subir
+  const [previews, setPreviews] = useState([]); // URLs temporales (blob) para previsualizar esos archivos
 
   const isEdit = Boolean(producto);
 
+  // Precarga el formulario con los datos del producto al editar (o lo resetea al crear uno nuevo)
   useEffect(() => {
     if (producto) {
       setForm({
@@ -36,6 +38,7 @@ const ProductFormModal = ({ producto, categorias, saving, onClose, onSubmit }) =
 
   const imagenesExistentes = producto?.imagenes?.length || 0;
 
+  // Agrega los archivos elegidos respetando el máximo de imágenes por producto
   const handleFiles = (files) => {
     const list = Array.from(files);
     const espacioDisponible = MAX_IMAGENES - imagenesExistentes - nuevasImagenes.length;
@@ -54,15 +57,18 @@ const ProductFormModal = ({ producto, categorias, saving, onClose, onSubmit }) =
     setPreviews((prev) => [...prev, ...aAgregar.map((f) => URL.createObjectURL(f))]);
   };
 
+  // Descarta una imagen nueva (todavía no subida) antes de guardar
   const removeNuevaImagen = (index) => {
     setNuevasImagenes((prev) => prev.filter((_, i) => i !== index));
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Borra una imagen ya guardada en el producto (llamada directa a la API vía Redux)
   const handleRemoveExistingImagen = (imagenId) => {
     dispatch(deleteImagenProducto({ productoId: producto.id, imagenId }));
   };
 
+  // Arma el payload final (con categoría única y las imágenes nuevas) y lo delega al padre
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({

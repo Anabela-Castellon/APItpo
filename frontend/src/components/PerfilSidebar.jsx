@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/authSlice';
 
+// Agrega la clase "active" al link cuando su ruta coincide con la actual
 const navLinkClass = ({ isActive }) =>
     `perfil-nav-link${isActive ? ' active' : ''}`;
 
@@ -48,6 +49,7 @@ const LogoutIcon = () => (
     </svg>
 );
 
+// Menú lateral de la sección "Mi perfil" (perfil, pedidos, favoritos, logout)
 const PerfilSidebar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();

@@ -18,6 +18,7 @@ import com.uade.tpo.backend.model.Consulta;
 import com.uade.tpo.backend.model.EstadoConsulta;
 import com.uade.tpo.backend.service.ConsultaService;
 
+// Controlador de consultas (formulario de contacto): crear es público, el resto es solo ADMIN
 @RestController
 @RequestMapping("/api/consultas")
 public class ConsultaController {
@@ -46,6 +47,7 @@ public class ConsultaController {
     // PUT /api/consultas/1/estado -> actualizar estado (solo ADMIN)
     @PutMapping("/{id}/estado")
     public Consulta actualizarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        // Convierte el string recibido ("PENDIENTE", "RESPONDIDA", etc.) al enum EstadoConsulta
         EstadoConsulta nuevoEstado = EstadoConsulta.valueOf(body.get("estado"));
         return consultaService.actualizarEstado(id, nuevoEstado);
     }

@@ -11,6 +11,7 @@ import {
   deleteProducto,
 } from '../../store/productsSlice';
 
+// Panel admin de productos: listado con búsqueda/filtro y alta/edición/baja vía ProductFormModal
 const AdminProductos = () => {
   const dispatch = useDispatch();
   const { items, categorias, loading, saving } = useSelector((state) => state.productos);
@@ -24,6 +25,7 @@ const AdminProductos = () => {
     dispatch(fetchCategorias());
   }, [dispatch]);
 
+  // Filtra localmente por nombre y categoría (sin volver a pedirle al backend)
   const productosFiltrados = useMemo(() => {
     return items.filter((p) => {
       const matchNombre = p.nombre?.toLowerCase().includes(search.toLowerCase());
@@ -42,6 +44,7 @@ const AdminProductos = () => {
     setModalOpen(true);
   };
 
+  // Crea o actualiza según haya o no un producto en edición, y avisa si fallaron imágenes
   const handleSubmit = async (data) => {
     try {
       const accion = productoEditando
@@ -59,6 +62,7 @@ const AdminProductos = () => {
     }
   };
 
+  // Pide confirmación antes de borrar el producto
   const handleDelete = (producto) => {
     if (window.confirm(`¿Eliminar "${producto.nombre}"? Esta acción no se puede deshacer.`)) {
       dispatch(deleteProducto(producto.id));

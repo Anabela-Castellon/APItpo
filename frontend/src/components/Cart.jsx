@@ -20,11 +20,13 @@ const TrashIcon = () => (
   </svg>
 );
 
+// Página del carrito: lista los productos agregados, permite cambiar cantidades y va al checkout
 const Cart = () => {
   const dispatch = useDispatch();
 
   const { items: cartItems, total, loading, error } = useSelector((state) => state.cart);
 
+  // Carga el carrito del usuario apenas se monta la página
   useEffect(() => {
     dispatch(fetchCartItems());
   }, [dispatch]);

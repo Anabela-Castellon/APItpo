@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.backend.model.Producto;
 import com.uade.tpo.backend.service.ProductoService;
 
+// Controlador de productos: lectura pública, escritura restringida a VENDEDOR/ADMIN (ver SecurityConfig)
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoController {
@@ -52,6 +53,7 @@ public class ProductoController {
     }
   }
 
+  // GET /api/productos/1 -> detalle de un producto
   @GetMapping("/{id}")
   public Object getProductoById(@PathVariable Long id) {
       return productoService.getProductoById(id);

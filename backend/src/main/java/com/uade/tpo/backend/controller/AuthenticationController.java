@@ -12,6 +12,7 @@ import com.uade.tpo.backend.service.CreationService;
  
 import lombok.RequiredArgsConstructor;
  
+// Controlador de autenticación: registro (con distintos roles) y login, todo público
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

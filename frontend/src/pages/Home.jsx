@@ -11,6 +11,7 @@ import pedidosIcon from '../assets/pedidoss.png';
 import retiroIcon from '../assets/retiro.png';
 import '../styles/home.css';
 
+// Página de inicio: banners, filtro rápido por categoría y grilla de productos destacados
 const Home = () => {
   const navigate = useNavigate();
   const [productos, setProductos] = useState([]);
@@ -18,6 +19,7 @@ const Home = () => {
   const [categoriaId, setCategoriaId] = useState('');
   const [cargando, setCargando] = useState(true);
 
+  // Carga productos y categorías una sola vez al entrar a la página
   useEffect(() => {
     const cargarDatos = async () => {
       try {
@@ -37,11 +39,13 @@ const Home = () => {
     cargarDatos();
   }, []);
 
+  // Filtra por la categoría seleccionada en los "pills"
   const productosFiltrados = useMemo(() => {
     if (!categoriaId) return productos;
     return productos.filter((p) => (p.categorias || []).some((c) => String(c.id) === categoriaId));
   }, [productos, categoriaId]);
 
+  // Solo se muestran los primeros 6 como "destacados"
   const featured = productosFiltrados.slice(0, 6);
 
   return (

@@ -3,6 +3,7 @@ package com.uade.tpo.backend.dto;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+// DTO que recibe los datos del formulario de registro (usuario + perfil + clave maestra si es admin)
 @Data
 public class RegistrationRequestDTO {
     private String email;

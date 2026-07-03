@@ -28,11 +28,12 @@ const CartIcon = () => (
   </svg>
 );
 
+// Barra de navegación superior: links, buscador, menú de usuario y acceso al carrito
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
-  
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const isAdmin = useSelector((state) => state.auth.roles?.includes('ROLE_ADMIN'));
   
@@ -60,6 +61,7 @@ const Navbar = () => {
     navigate('/');
   };
 
+  // Navega al catálogo pasando el término de búsqueda como query param ?q=
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     navigate(`/productos${busqueda ? `?q=${encodeURIComponent(busqueda)}` : ''}`);

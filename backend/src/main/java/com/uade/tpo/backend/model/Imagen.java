@@ -18,6 +18,7 @@ import lombok.Data;
 
 
 
+// Entidad Imagen: archivo binario asociado a un producto o a un perfil (excluyentes)
 @Data
 @Entity
 public class Imagen {
@@ -28,17 +29,20 @@ public class Imagen {
     private String nombre;
     private String extension; // e.g., "png", "jpg"
 
+    // Contenido binario de la imagen; se guarda como BLOB y no se expone en las respuestas JSON (solo lectura de la BD)
     @Lob
     @Basic(fetch = FetchType.LAZY) // This prevents loading the image until you actually call getData()
     @Column(columnDefinition = "LONGBLOB")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private byte[] data;
 
+    // Producto al que pertenece (si es una imagen de producto)
     @ManyToOne
     @JoinColumn(name = "producto_id")
     @JsonIgnore
     private Producto producto;
 
+    // Perfil al que pertenece (si es una foto de perfil)
     @OneToOne
     @JoinColumn(name = "perfil_id")
     @JsonIgnore

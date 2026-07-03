@@ -14,6 +14,7 @@ import com.uade.tpo.backend.repository.ProductoRepository;
 import com.uade.tpo.backend.exception.*;
 import jakarta.transaction.Transactional;
 
+// Lógica de negocio del carrito: agregar/quitar productos, validar stock, recalcular total y checkout
 @Service
 @Transactional
 public class CarritoService {
@@ -26,18 +27,22 @@ public class CarritoService {
 
   // --- BASIC CRUD ---
 
+  // Devuelve todos los carritos
   public List<Carrito> findAll() {
     return carritoRepository.findAll();
   }
 
+  // Busca un carrito por id (puede no existir)
   public Optional<Carrito> findById(Long id) {
     return carritoRepository.findById(id);
   }
 
+  // Crea/guarda un carrito nuevo
   public Carrito create(Carrito carrito) {
     return carritoRepository.save(carrito);
   }
 
+  // Borra el carrito por completo
   public void delete(Long id) {
     carritoRepository.deleteById(id);
   }
@@ -124,6 +129,7 @@ public class CarritoService {
     carrito.setPrecioTotal(total);
   }
 
+  // Confirma la compra: valida stock de todos los items, lo descuenta del catálogo y vacía el carrito
   public String checkout(Long carritoId) {
     Carrito carrito = carritoRepository.findById(carritoId)
         .orElseThrow(() -> new ResourceNotFoundException("Carrito no encontrado")); //

@@ -21,29 +21,34 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
  
+    // Devuelve todos los usuarios
     public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
     }
- 
+
+    // Busca un usuario por id, o lanza error si no existe
     public Usuario obtenerUsuarioPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
     }
- 
+
+    // Elimina un usuario por id
     public void deleteUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }
 
+    // Deshabilita al usuario (solo si está actualmente habilitado) para que no pueda loguearse más
     public void darDeBajaUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
+
         if (usuario.isEnabled()){
         usuario.setDadoDeAlta(false); // Note: "dar de baja" usually means setting to false
         usuarioRepository.save(usuario);
         }
     }
 
+    // Reactiva al usuario (solo si está actualmente deshabilitado)
     public void darDeAltaUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

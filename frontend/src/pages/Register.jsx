@@ -14,6 +14,7 @@ import pedidosIcon from '../assets/pedidoss.png';
 import '../styles/login.css';
 import '../styles/register.css';
 
+// Página de registro: crea la cuenta con el rol elegido y loguea automáticamente con el token devuelto
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -37,6 +38,7 @@ const Register = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Valida contraseñas, arma el payload y llama al endpoint de registro según el rol elegido
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -57,6 +59,7 @@ const Register = () => {
       claveMaestra: form.claveMaestra
     };
 
+    // Cada rol se registra contra un endpoint distinto (el de ADMIN además pide clave maestra)
     const endpointPorRol = {
       COMPRADOR: '/api/auth/register',
       VENDEDOR: '/api/auth/register/vendedor',
@@ -71,6 +74,7 @@ const Register = () => {
       });
 
       if (response.ok) {
+        // El backend devuelve el JWT como texto plano; lo guardamos y logueamos directo
         const token = await response.text();
         dispatch(setCredentials(token));
         navigate('/');

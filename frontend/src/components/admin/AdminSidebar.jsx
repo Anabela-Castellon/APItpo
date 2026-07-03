@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import logo from '../../assets/laEsquinaLogo.png';
 
+// Agrega la clase "active" al link cuando su ruta coincide con la actual
 const navLinkClass = ({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`;
 
+// Secciones del menú lateral de administración
 const navItems = [
   { to: '/admin', end: true, icon: '🏠', label: 'Dashboard' },
   { to: '/admin/pedidos', icon: '🛍️', label: 'Pedidos' },
@@ -17,6 +19,7 @@ const navItems = [
   { to: '/admin/configuracion', icon: '⚙️', label: 'Configuración' },
 ];
 
+// Menú lateral fijo de las páginas de administración
 const AdminSidebar = () => {
   return (
     <aside className="admin-sidebar">

@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { apiFetch } from '../services/api';
 
+// Envía una consulta del formulario de contacto (POST público)
 export const crearConsulta = createAsyncThunk(
   'consultas/crear',
   async ({ nombre, email, asunto, mensaje }, { rejectWithValue }) => {
@@ -16,6 +17,7 @@ export const crearConsulta = createAsyncThunk(
   }
 );
 
+// Trae todas las consultas (solo ADMIN, usado en el panel admin)
 export const fetchConsultas = createAsyncThunk(
   'consultas/fetchAll',
   async (_, { rejectWithValue }) => {
@@ -27,6 +29,7 @@ export const fetchConsultas = createAsyncThunk(
   }
 );
 
+// Cambia el estado de una consulta (PENDIENTE/RESPONDIDA/CERRADA)
 export const actualizarEstadoConsulta = createAsyncThunk(
   'consultas/actualizarEstado',
   async ({ id, estado }, { rejectWithValue }) => {
@@ -78,6 +81,7 @@ const consultasSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(actualizarEstadoConsulta.fulfilled, (state, action) => {
+        // Reemplaza la consulta actualizada dentro de la lista sin refetchear todo
         const index = state.items.findIndex((c) => c.id === action.payload.id);
         if (index >= 0) state.items[index] = action.payload;
       });

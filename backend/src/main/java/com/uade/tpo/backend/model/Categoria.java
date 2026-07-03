@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+// Entidad Categoria: clasifica productos (ej: Tortas, Bebidas). Relación muchos a muchos con Producto
 @Data
 @Entity
 @Table(name = "categorias")
@@ -20,6 +21,7 @@ public class Categoria {
     @Column(nullable = false, unique = true)
     private String nombre;
 
+    // Lado inverso de la relación (no se serializa para evitar referencias circulares en el JSON)
     @JsonIgnore
     @ManyToMany(mappedBy = "categorias", fetch = FetchType.LAZY)
     private List<Producto> productos = new ArrayList<>();

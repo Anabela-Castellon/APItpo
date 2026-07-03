@@ -8,6 +8,7 @@ import App from "./App.jsx";
 import "./styles/variables.css"; 
 import "./styles/index.css"; 
 
+// Punto de entrada: monta la app React en el div#root del index.html
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />

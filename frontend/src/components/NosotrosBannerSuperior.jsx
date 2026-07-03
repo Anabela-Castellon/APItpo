@@ -1,6 +1,7 @@
 import bannerNosotros from "../assets/NosotrosBannerSuperior.png";
 import "../styles/nosotrosBanner.css";
 
+// Banner superior de la página "Nosotros" con botones que hacen scroll a las secciones internas
 const NosotrosBannerSuperior = () => {
   return (
     <div className="nosotros-banner-container">

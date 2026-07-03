@@ -2,6 +2,8 @@ import React from 'react';
 
 const PRECIO_MAX = 10000;
 
+// Barra lateral de filtros del catálogo: búsqueda, categoría, rango de precio, disponibilidad y orden
+// (es un componente controlado: recibe el estado y los setters desde el padre, Catalog.jsx)
 const Sidebar = ({
   search,
   onSearchChange,
