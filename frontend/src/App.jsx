@@ -17,6 +17,7 @@ import CartRedux from "./components/CartRedux";
 import Perfil from "./pages/Perfil";
 import MisPedidos from "./pages/MisPedidos";
 import Favoritos from "./pages/Favoritos";
+import Nosotros from "./pages/Nosotros";
 import AdminProductos from "./pages/admin/AdminProductos";
 import AdminPlaceholder from "./pages/admin/AdminPlaceholder";
 
@@ -36,6 +37,7 @@ const AppLayout = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/productos" element={<Catalog />} />
+                <Route path="/nosotros" element={<Nosotros />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductDetail />} />

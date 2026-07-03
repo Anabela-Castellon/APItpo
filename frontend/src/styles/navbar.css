@@ -5,6 +5,9 @@
   padding: 1rem 4rem; /* Ajustá el padding lateral a tu gusto */
   background-color: var(--color-blanco);
   border-bottom: 1px solid var(--color-borde);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar-logo img {
