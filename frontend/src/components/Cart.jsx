@@ -1,91 +1,148 @@
 // Ruta: src/components/Cart.jsx
-//
-// Esta es la página del carrito.
-// Muestra todos los productos que el usuario agregó,
-// permite cambiar cantidades, eliminar items y ver el total.
-// Desde acá también puede ir al checkout o volver al catálogo.
- 
+
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../hooks/useContext/CartContext';
- 
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  fetchCartItems, 
+  addProductoToCart, 
+  removeProductoFromCart 
+} from '../store/cartSlice';
+
 const Cart = () => {
-  // Traemos todo lo que necesitamos del contexto del carrito
-  const { cartItems, removeFromCart, updateQuantity, total } = useCart();
- 
+  const dispatch = useDispatch();
+  
+  const { items: cartItems, total, loading, error } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    dispatch(fetchCartItems());
+  }, [dispatch]);
+
+  // Agregamos 'maxStock' como parámetro para validar antes de enviar a la API
+  const handleUpdateQuantity = (productoId, currentQuantity, newQuantity, maxStock) => {
+    if (newQuantity <= 0) {
+      dispatch(removeProductoFromCart(productoId));
+    } else if (maxStock !== undefined && newQuantity > maxStock) {
+      // Si la nueva cantidad supera el stock, bloqueamos la ejecución
+      return;
+    } else {
+      const delta = newQuantity - currentQuantity;
+      dispatch(addProductoToCart({ productoId, cantidad: delta }));
+    }
+  };
+
+  if (loading && cartItems.length === 0) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center', fontSize: '1.2rem' }}>
+        Cargando carrito...
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
       <h1>Carrito de Compras</h1>
+
+      {error && (
+        <div style={{ color: 'red', marginBottom: '1rem' }}>
+          Error al actualizar el carrito: {error}
+        </div>
+      )}
  
-      {/* Solo mostramos cuántos productos hay si el carrito no está vacío */}
       {cartItems.length > 0 && (
         <p>Tenés {cartItems.length} producto(s) en el carrito</p>
       )}
  
-      {/* Si el carrito está vacío mostramos un mensaje, si no mostramos la lista */}
       {cartItems.length === 0 ? (
         <p>Tu carrito está vacío</p>
       ) : (
         <>
           <div style={{ marginBottom: '2rem' }}>
-            {cartItems.map(item => (
-              <div
-                key={item.id}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr auto auto',
-                  gap: '1rem',
-                  alignItems: 'center',
-                  padding: '1rem',
-                  borderBottom: '1px solid #eee'
-                }}
-              >
-                {/* Info del producto */}
-                <div>
-                  <h3 style={{ margin: '0 0 0.5rem 0' }}>{item.nombre}</h3>
-                  <p style={{ margin: '0', color: '#666' }}>${item.precio} c/u</p>
-                  {/* El subtotal se calcula precio x cantidad */}
-                  <p style={{ margin: '0.5rem 0', color: '#aa3bff', fontWeight: 'bold' }}>
-                    Subtotal: ${(item.precio * item.quantity).toLocaleString('es-AR')}
-                  </p>
-                </div>
- 
-                {/* Botones para aumentar o disminuir la cantidad */}
-                {/* Si la cantidad llega a 0, updateQuantity llama a removeFromCart automáticamente */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    style={{ padding: '4px 10px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}
-                  >
-                    −
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    style={{ padding: '4px 10px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}
-                  >
-                    +
-                  </button>
-                </div>
- 
-                {/* Botón para eliminar el producto sin importar la cantidad */}
-                <button
-                  onClick={() => removeFromCart(item.id)}
+            {cartItems.map(item => {
+              const productoInfo = item.producto || item;
+              const itemQuantity = item.quantity || item.cantidad || 1;
+              const productoId = productoInfo.id;
+              const precio = productoInfo.precio || 0;
+              const subtotal = precio * itemQuantity;
+              
+              // Extraemos el stock disponible del producto
+              const stockDisponible = productoInfo.stock;
+              // Determinamos si ya se alcanzó el límite de stock disponible
+              const alcanzoLimite = stockDisponible !== undefined && itemQuantity >= stockDisponible;
+
+              return (
+                <div
+                  key={item.id}
                   style={{
-                    padding: '0.5rem',
-                    background: 'none',
-                    border: '1px solid #ff4444',
-                    color: '#ff4444',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto auto',
+                    gap: '1rem',
+                    alignItems: 'center',
+                    padding: '1rem',
+                    borderBottom: '1px solid #eee',
+                    opacity: loading ? 0.6 : 1
                   }}
                 >
-                  Eliminar
-                </button>
-              </div>
-            ))}
+                  {/* Info del producto */}
+                  <div>
+                    <h3 style={{ margin: '0 0 0.5rem 0' }}>{productoInfo.nombre || 'Producto sin nombre'}</h3>
+                    <p style={{ margin: '0', color: '#666' }}>${precio.toLocaleString('es-AR')} c/u</p>
+                    {stockDisponible !== undefined && (
+                      <p style={{ margin: '0', fontSize: '0.85rem', color: '#888' }}>
+                        Disponibles: {stockDisponible} u.
+                      </p>
+                    )}
+                    <p style={{ margin: '0.5rem 0', color: '#ff4444', fontWeight: 'bold' }}>
+                      Subtotal: ${subtotal.toLocaleString('es-AR')}
+                    </p>
+                  </div>
+   
+                  {/* Botones con control de stock */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      disabled={loading}
+                      onClick={() => handleUpdateQuantity(productoId, itemQuantity, itemQuantity - 1, stockDisponible)}
+                      style={{ padding: '4px 10px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}
+                    >
+                      −
+                    </button>
+                    <span>{itemQuantity}</span>
+                    <button
+                      disabled={loading || alcanzoLimite} // Se deshabilita si carga o si no hay más stock
+                      onClick={() => handleUpdateQuantity(productoId, itemQuantity, itemQuantity + 1, stockDisponible)}
+                      title={alcanzoLimite ? "Alcanzaste el stock máximo disponible" : "Agregar uno más"}
+                      style={{ 
+                        padding: '4px 10px', 
+                        cursor: alcanzoLimite ? 'not-allowed' : 'pointer', 
+                        borderRadius: '4px', 
+                        border: '1px solid #ccc',
+                        backgroundColor: alcanzoLimite ? '#eaeaea' : '#fff',
+                        color: alcanzoLimite ? '#aaa' : '#000'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+   
+                  <button
+                    disabled={loading}
+                    onClick={() => dispatch(removeProductoFromCart(productoId))}
+                    style={{
+                      padding: '0.5rem',
+                      background: 'none',
+                      border: '1px solid #ff4444',
+                      color: '#ff4444',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              );
+            })}
           </div>
  
-          {/* Total general del carrito */}
           <div style={{
             display: 'flex',
             justifyContent: 'flex-end',
@@ -96,12 +153,11 @@ const Cart = () => {
             fontSize: '1.2rem',
             fontWeight: 'bold'
           }}>
-            Total: ${total.toLocaleString('es-AR')}
+            Total: ${(total || 0).toLocaleString('es-AR')}
           </div>
         </>
       )}
  
-      {/* Botones de navegación */}
       <div style={{ display: 'flex', gap: '1rem' }}>
         <Link
           to="/"
@@ -117,7 +173,6 @@ const Cart = () => {
           Seguir comprando
         </Link>
  
-        {/* El botón de pagar solo aparece si hay algo en el carrito */}
         {cartItems.length > 0 && (
           <Link
             to="/checkout"

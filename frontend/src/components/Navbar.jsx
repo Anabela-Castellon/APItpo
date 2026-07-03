@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom';
+// Asegúrate de usar useDispatch y useSelector
 import { useDispatch, useSelector } from 'react-redux';
 import logo from '../assets/laEsquinaLogo.png';
-import { useCart } from '../hooks/useContext/CartContext';
 import { logout } from '../store/authSlice';
 import '../styles/navbar.css';
 
@@ -29,12 +29,16 @@ const CartIcon = () => (
 );
 
 const Navbar = () => {
-  const { cartItems } = useCart();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
+  
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const isAdmin = useSelector((state) => state.auth.roles?.includes('ROLE_ADMIN'));
+  
+  // Extraemos los items del carrito desde Redux en lugar del contexto
+  const cartItems = useSelector((state) => state.cart.items) || [];
+  
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState(searchParams.get('q') || '');
   const menuRef = useRef(null);
@@ -61,7 +65,12 @@ const Navbar = () => {
     navigate(`/productos${busqueda ? `?q=${encodeURIComponent(busqueda)}` : ''}`);
   };
 
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  // Calculamos el total de items sumando la cantidad de cada uno
+  // Manejamos 'cantidad' o 'quantity' para evitar problemas con la API
+  const totalItems = cartItems.reduce((acc, item) => {
+    const cantidad = item.cantidad || item.quantity || 1;
+    return acc + cantidad;
+  }, 0);
 
   return (
     <nav className="navbar">

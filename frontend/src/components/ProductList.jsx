@@ -2,18 +2,20 @@
 //
 // Muestra el catálogo completo de productos.
 // Hace un fetch a la API cuando carga la pantalla y guarda los productos en estado.
-// Cada producto tiene un botón "Agregar al Carrito" que usa el contexto del carrito.
+// Cada producto tiene un botón "Agregar al Carrito" que usa Redux para pegarle al endpoint.
  
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../hooks/useContext/CartContext';
+// Eliminamos useCart e importamos Redux
+import { useDispatch } from 'react-redux';
+import { addProductoToCart } from '../store/cartSlice';
  
 const ProductList = () => {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
  
-  // Traemos addToCart del contexto para poder usarlo en el botón
-  const { addToCart } = useCart();
+  // Inicializamos dispatch
+  const dispatch = useDispatch();
  
   // useEffect con array vacío [] = se ejecuta una sola vez cuando carga el componente
   useEffect(() => {
@@ -75,9 +77,9 @@ const ProductList = () => {
                 Ver detalles →
               </Link>
  
-              {/* Al hacer click llamamos a addToCart con el producto completo */}
+              {/* Al hacer click despachamos la acción de Redux con el id del producto y cantidad 1 */}
               <button
-                onClick={() => addToCart(prod)}
+                onClick={() => dispatch(addProductoToCart({ productoId: prod.id, cantidad: 1 }))}
                 style={{
                   cursor: 'pointer',
                   padding: '8px',

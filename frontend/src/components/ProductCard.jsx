@@ -1,22 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../hooks/useContext/CartContext';
+// Eliminamos useCart
 import { toggleFavorito } from '../store/favoritosSlice';
 import { useDispatch, useSelector } from "react-redux";
 import { getImagenUrl } from '../services/api';
 import faheart from '../assets/heart-solid-full.svg';
-import faheartn from '../assets/heart-regular-full.svg'
+import faheartn from '../assets/heart-regular-full.svg';
+
+// Importamos la acción de Redux para agregar al carrito
+import { addProductoToCart } from '../store/cartSlice';
 
 const ProductCard = ({ product }) => {
-    const { addToCart, cartItems } = useCart();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+    // Traemos los items del carrito desde Redux en lugar del context
+    const cartItems = useSelector((state) => state.cart.items) || [];
 
     const esFavorito = useSelector((state) =>
         isLoggedIn && state.favoritos.items.some((item) => item.id === Number(product.id))
     );
 
-    const enCarrito = cartItems.find((item) => item.id === product.id)?.quantity || 0;
+    // Buscamos la cantidad actual que hay de este producto en el carrito
+    const enCarrito = cartItems.find((item) => item.id === product.id)?.cantidad || 
+                      cartItems.find((item) => item.id === product.id)?.quantity || 0;
+                      
     const sinStock = product.stock !== undefined && product.stock <= 0;
     const alcanzoLimite = product.stock !== undefined && enCarrito >= product.stock;
     const primeraImagen = product.imagenes?.[0];
@@ -31,6 +39,11 @@ const ProductCard = ({ product }) => {
         }
 
         dispatch(toggleFavorito(product));
+    };
+
+    const handleAddToCart = () => {
+        // Despachamos el thunk que le pega al endpoint POST
+        dispatch(addProductoToCart({ productoId: product.id, cantidad: 1 }));
     };
 
     return (
@@ -68,7 +81,7 @@ const ProductCard = ({ product }) => {
 
                     <button
                         className="btn-add"
-                        onClick={() => addToCart(product)}
+                        onClick={handleAddToCart}
                         title={alcanzoLimite ? 'Alcanzaste el stock disponible' : 'Agregar al carrito'}
                         disabled={sinStock || alcanzoLimite}
                     >
