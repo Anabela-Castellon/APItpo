@@ -3,15 +3,26 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { 
-  fetchCartItems, 
-  addProductoToCart, 
-  removeProductoFromCart 
+import {
+  fetchCartItems,
+  addProductoToCart,
+  removeProductoFromCart
 } from '../store/cartSlice';
+import { getImagenUrl } from '../services/api';
+import '../styles/cart.css';
+
+const TrashIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M3 6h18" strokeLinecap="round" />
+    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" strokeLinecap="round" />
+    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" strokeLinecap="round" />
+    <path d="M10 11v6M14 11v6" strokeLinecap="round" />
+  </svg>
+);
 
 const Cart = () => {
   const dispatch = useDispatch();
-  
+
   const { items: cartItems, total, loading, error } = useSelector((state) => state.cart);
 
   useEffect(() => {
@@ -32,165 +43,131 @@ const Cart = () => {
   };
 
   if (loading && cartItems.length === 0) {
-    return (
-      <div style={{ padding: '2rem', textAlign: 'center', fontSize: '1.2rem' }}>
-        Cargando carrito...
-      </div>
-    );
+    return <div className="cart-loading">Cargando carrito...</div>;
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
-      <h1>Carrito de Compras</h1>
+    <div className="page-container cart-page">
+      <div className="cart-header">
+        <h1>Mi carrito</h1>
+        <p className="cart-subtitle">Revisá tu pedido antes de finalizar la compra.</p>
+      </div>
 
-      {error && (
-        <div style={{ color: 'red', marginBottom: '1rem' }}>
-          Error al actualizar el carrito: {error}
-        </div>
-      )}
- 
-      {cartItems.length > 0 && (
-        <p>Tenés {cartItems.length} producto(s) en el carrito</p>
-      )}
- 
+      {error && <div className="cart-error">Error al actualizar el carrito: {error}</div>}
+
       {cartItems.length === 0 ? (
-        <p>Tu carrito está vacío</p>
+        <div className="cart-empty">
+          <p>Tu carrito está vacío</p>
+          <Link to="/" className="btn-continue">Seguir comprando</Link>
+        </div>
       ) : (
-        <>
-          <div style={{ marginBottom: '2rem' }}>
+        <div className="cart-layout">
+          <div className="cart-table">
+            <div className="cart-row cart-row-head">
+              <span>Producto</span>
+              <span>Precio unitario</span>
+              <span>Cantidad</span>
+              <span>Subtotal</span>
+              <span></span>
+            </div>
+
             {cartItems.map(item => {
               const productoInfo = item.producto || item;
               const itemQuantity = item.quantity || item.cantidad || 1;
               const productoId = productoInfo.id;
               const precio = productoInfo.precio || 0;
               const subtotal = precio * itemQuantity;
-              
-              // Extraemos el stock disponible del producto
+
               const stockDisponible = productoInfo.stock;
-              // Determinamos si ya se alcanzó el límite de stock disponible
               const alcanzoLimite = stockDisponible !== undefined && itemQuantity >= stockDisponible;
+              const sinStock = stockDisponible !== undefined && stockDisponible <= 0;
+              const primeraImagen = productoInfo.imagenes?.[0];
 
               return (
-                <div
-                  key={item.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr auto auto',
-                    gap: '1rem',
-                    alignItems: 'center',
-                    padding: '1rem',
-                    borderBottom: '1px solid #eee',
-                    opacity: loading ? 0.6 : 1
-                  }}
-                >
-                  {/* Info del producto */}
-                  <div>
-                    <h3 style={{ margin: '0 0 0.5rem 0' }}>{productoInfo.nombre || 'Producto sin nombre'}</h3>
-                    <p style={{ margin: '0', color: '#666' }}>${precio.toLocaleString('es-AR')} c/u</p>
-                    {stockDisponible !== undefined && (
-                      <p style={{ margin: '0', fontSize: '0.85rem', color: '#888' }}>
-                        Disponibles: {stockDisponible} u.
-                      </p>
-                    )}
-                    <p style={{ margin: '0.5rem 0', color: '#ff4444', fontWeight: 'bold' }}>
-                      Subtotal: ${subtotal.toLocaleString('es-AR')}
-                    </p>
+                <div key={item.id} className={`cart-row${loading ? ' cart-row-loading' : ''}`}>
+                  <div className="cart-product">
+                    <div className="cart-product-img">
+                      {primeraImagen ? (
+                        <img src={getImagenUrl(productoId, primeraImagen.id)} alt={productoInfo.nombre} />
+                      ) : (
+                        <div className="cart-img-placeholder" aria-hidden="true">🎂</div>
+                      )}
+                    </div>
+                    <div className="cart-product-info">
+                      <h3>{productoInfo.nombre || 'Producto sin nombre'}</h3>
+                      <div className="availability">
+                        <span className={`dot${sinStock ? ' dot-off' : ''}`}></span>
+                        {sinStock ? 'Sin stock' : 'Disponible hoy'}
+                      </div>
+                    </div>
                   </div>
-   
-                  {/* Botones con control de stock */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+                  <div className="cart-cell cart-price">${precio.toLocaleString('es-AR')}</div>
+
+                  <div className="cart-cell">
+                    <div className="qty-box">
+                      <button
+                        disabled={loading}
+                        onClick={() => handleUpdateQuantity(productoId, itemQuantity, itemQuantity - 1, stockDisponible)}
+                        aria-label="Restar"
+                      >
+                        −
+                      </button>
+                      <span>{itemQuantity}</span>
+                      <button
+                        disabled={loading || alcanzoLimite}
+                        onClick={() => handleUpdateQuantity(productoId, itemQuantity, itemQuantity + 1, stockDisponible)}
+                        title={alcanzoLimite ? 'Alcanzaste el stock máximo disponible' : 'Agregar uno más'}
+                        aria-label="Sumar"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="cart-cell cart-subtotal">${subtotal.toLocaleString('es-AR')}</div>
+
+                  <div className="cart-cell cart-remove">
                     <button
                       disabled={loading}
-                      onClick={() => handleUpdateQuantity(productoId, itemQuantity, itemQuantity - 1, stockDisponible)}
-                      style={{ padding: '4px 10px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ccc' }}
+                      onClick={() => dispatch(removeProductoFromCart(productoId))}
+                      aria-label="Eliminar del carrito"
+                      className="btn-trash"
                     >
-                      −
-                    </button>
-                    <span>{itemQuantity}</span>
-                    <button
-                      disabled={loading || alcanzoLimite} // Se deshabilita si carga o si no hay más stock
-                      onClick={() => handleUpdateQuantity(productoId, itemQuantity, itemQuantity + 1, stockDisponible)}
-                      title={alcanzoLimite ? "Alcanzaste el stock máximo disponible" : "Agregar uno más"}
-                      style={{ 
-                        padding: '4px 10px', 
-                        cursor: alcanzoLimite ? 'not-allowed' : 'pointer', 
-                        borderRadius: '4px', 
-                        border: '1px solid #ccc',
-                        backgroundColor: alcanzoLimite ? '#eaeaea' : '#fff',
-                        color: alcanzoLimite ? '#aaa' : '#000'
-                      }}
-                    >
-                      +
+                      <TrashIcon />
                     </button>
                   </div>
-   
-                  <button
-                    disabled={loading}
-                    onClick={() => dispatch(removeProductoFromCart(productoId))}
-                    style={{
-                      padding: '0.5rem',
-                      background: 'none',
-                      border: '1px solid #ff4444',
-                      color: '#ff4444',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Eliminar
-                  </button>
                 </div>
               );
             })}
+
+            <div className="cart-banner">
+              <span>🥄 Todo lo que ves es elaborado artesanalmente con ingredientes reales y mucho amor.</span>
+            </div>
           </div>
- 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            padding: '1rem',
-            backgroundColor: '#f9f9f9',
-            borderRadius: '4px',
-            marginBottom: '1rem',
-            fontSize: '1.2rem',
-            fontWeight: 'bold'
-          }}>
-            Total: ${(total || 0).toLocaleString('es-AR')}
-          </div>
-        </>
+
+          <aside className="cart-summary">
+            <h2>Resumen de tu pedido</h2>
+
+            <div className="summary-row">
+              <span>Subtotal</span>
+              <span>${(total || 0).toLocaleString('es-AR')}</span>
+            </div>
+
+            <div className="summary-total">
+              <span>Total</span>
+              <span>${(total || 0).toLocaleString('es-AR')}</span>
+            </div>
+
+            <Link to="/checkout" className="btn-checkout">Finalizar compra</Link>
+            <Link to="/" className="btn-continue">← Seguir comprando</Link>
+
+            <p className="cart-secure">🔒 Compra 100% segura y protegida.</p>
+          </aside>
+        </div>
       )}
- 
-      <div style={{ display: 'flex', gap: '1rem' }}>
-        <Link
-          to="/"
-          style={{
-            backgroundColor: '#333',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            textDecoration: 'none'
-          }}
-        >
-          Seguir comprando
-        </Link>
- 
-        {cartItems.length > 0 && (
-          <Link
-            to="/checkout"
-            style={{
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              textDecoration: 'none'
-            }}
-          >
-            Pagar
-          </Link>
-        )}
-      </div>
     </div>
   );
 };
- 
+
 export default Cart;
