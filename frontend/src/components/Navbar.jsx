@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import logo from '../assets/laEsquinaLogo.png';
 import { logout } from '../store/authSlice';
+import { fetchCartItems } from '../store/cartSlice';
 import '../styles/navbar.css';
 
 const SearchIcon = () => (
@@ -28,11 +29,12 @@ const CartIcon = () => (
   </svg>
 );
 
+// Barra de navegación superior: links, buscador, menú de usuario y acceso al carrito
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
-  
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const isAdmin = useSelector((state) => state.auth.roles?.includes('ROLE_ADMIN'));
   
@@ -54,12 +56,22 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Al montar (incluyendo un F5 en cualquier página) o al iniciar sesión,
+  // sincronizamos el carrito para que el contador se muestre sin depender
+  // de que otro componente (como la página /cart) lo haya hecho antes.
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchCartItems());
+    }
+  }, [dispatch, isLoggedIn]);
+
   const handleLogout = () => {
     dispatch(logout());
     setMenuAbierto(false);
     navigate('/');
   };
 
+  // Navega al catálogo pasando el término de búsqueda como query param ?q=
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     navigate(`/productos${busqueda ? `?q=${encodeURIComponent(busqueda)}` : ''}`);

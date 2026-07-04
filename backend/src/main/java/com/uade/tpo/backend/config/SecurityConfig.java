@@ -25,32 +25,35 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  
 import lombok.RequiredArgsConstructor;
  
+// Configuración central de seguridad: define qué rutas son públicas, cuáles requieren rol, CORS y el filtro JWT
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
- 
+
     private final JwtFilter jwtFilter;
     private final UsuarioRepository usuarioRepository;
- 
+
     // Le dice a Spring Security cómo cargar un usuario desde la BD usando el email
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> usuarioRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
     }
- 
+
     // Expone el AuthenticationManager para que AuthenticationService lo pueda usar
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
- 
+
+    // Encoder para hashear contraseñas (BCrypt) antes de guardarlas o compararlas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
- 
+
+    // Define las reglas de autorización por ruta/rol y registra el filtro JWT
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -86,6 +89,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Configura CORS: qué orígenes/métodos/headers puede usar el frontend para llamar a la API
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

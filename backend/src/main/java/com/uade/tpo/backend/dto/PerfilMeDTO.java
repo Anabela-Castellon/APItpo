@@ -2,6 +2,7 @@ package com.uade.tpo.backend.dto;
 
 import lombok.Data;
 
+// DTO usado para ver/editar el perfil propio del usuario autenticado (endpoint /me)
 @Data
 public class PerfilMeDTO {
   private Long id;

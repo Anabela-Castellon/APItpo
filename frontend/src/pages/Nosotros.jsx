@@ -2,6 +2,7 @@ import NosotrosBannerSuperior from "../components/NosotrosBannerSuperior";
 import NosotrosCentro from "../assets/NosotrosCentro.png";
 import "../styles/nosotros.css";
 
+// Página institucional "Nosotros": historia de la marca y presentación del equipo
 const Nosotros = () => {
   return (
     <div className="page-container nosotros-page">

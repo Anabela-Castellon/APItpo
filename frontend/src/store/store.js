@@ -16,12 +16,15 @@ import authReducer from './authSlice';
 import productosReducer from './productsSlice';
 import consultasReducer from './consultasSlice';
 
+// Solo persiste token e isLoggedIn del slice de auth (redux-persist + localStorage)
 const authPersistConfig = {
     key: 'auth',
     storage: webStorage.default || webStorage,
     whitelist: ['token', 'isLoggedIn'],
 };
 
+// Middleware que, tras cada acción, sincroniza el token de Redux con localStorage["token"]
+// (services/api.js lee el token directo de ahí, no del store)
 const syncTokenWithLocalStorage = (storeApi) => (next) => (action) => {
     const result = next(action);
     const token = storeApi.getState().auth.token;
@@ -35,6 +38,7 @@ const syncTokenWithLocalStorage = (storeApi) => (next) => (action) => {
     return result;
 };
 
+// Store global de Redux: combina todos los slices y agrega el middleware de sincronización de token
 const store = configureStore({
     reducer: {
         favoritos: favoritosReducer,

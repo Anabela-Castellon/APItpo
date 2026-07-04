@@ -5,6 +5,7 @@ import { logout } from '../../store/authSlice';
 import AdminSidebar from './AdminSidebar';
 import '../../styles/admin.css';
 
+// Layout compartido de todas las páginas /admin: sidebar + topbar con buscador y menú de usuario
 const AdminLayout = ({ title, children }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -12,12 +13,14 @@ const AdminLayout = ({ title, children }) => {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const menuRef = useRef(null);
 
+  // Si no hay sesión, expulsa al login (no valida rol ADMIN, solo login)
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/login');
     }
   }, [isLoggedIn, navigate]);
 
+  // Cierra el menú de usuario si se hace click fuera de él
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {

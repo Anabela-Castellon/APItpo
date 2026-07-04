@@ -9,6 +9,7 @@ const badgeClassPorEstado = {
   CERRADA: 'admin-badge-cerrada',
 };
 
+// Panel admin: lista las consultas del formulario de contacto, con filtro por estado y respuesta rápida
 const AdminConsultas = () => {
   const dispatch = useDispatch();
   const { items, loading } = useSelector((state) => state.consultas);
@@ -27,6 +28,7 @@ const AdminConsultas = () => {
     dispatch(actualizarEstadoConsulta({ id: consulta.id, estado }));
   };
 
+  // Abre el cliente de mail del usuario con un mensaje precargado y marca la consulta como respondida
   const handleResponder = (consulta) => {
     const asunto = encodeURIComponent(`Re: ${consulta.asunto || 'Tu consulta a La Esquina'}`);
     const cuerpo = encodeURIComponent(`Hola ${consulta.nombre},\n\nEn relación a tu consulta:\n"${consulta.mensaje}"\n\n`);

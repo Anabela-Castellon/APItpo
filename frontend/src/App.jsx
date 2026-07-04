@@ -23,12 +23,14 @@ import AdminProductos from "./pages/admin/AdminProductos";
 import AdminConsultas from "./pages/admin/AdminConsultas";
 import AdminPlaceholder from "./pages/admin/AdminPlaceholder";
 
+// Wrapper que protege rutas: si no hay sesión, redirige a /login guardando la ruta de origen
 const RequireAuth = ({ children }) => {
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
     const location = useLocation();
     return isLoggedIn ? children : <Navigate to="/login" state={{ from: location }} replace />;
 };
 
+// Define todas las rutas de la app; oculta el Navbar público en las rutas /admin
 const AppLayout = () => {
     const location = useLocation();
     const isAdmin = location.pathname.startsWith('/admin');
@@ -67,6 +69,7 @@ const AppLayout = () => {
     );
 };
 
+// Componente raíz: monta Redux (con persistencia), el contexto del carrito y el router
 function App() {
     return (
         <Provider store={store}>

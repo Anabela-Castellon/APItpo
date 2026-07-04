@@ -13,6 +13,7 @@ import retiroIcon from '../assets/retiro.png';
 import '../styles/catalog.css';
 import '../styles/productDetail.css';
 
+// Página de detalle de un producto: galería de imágenes, selector de cantidad y acciones de compra
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -28,7 +29,9 @@ const ProductDetail = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const esFavorito = useSelector((state) => state.favoritos.items.some((item) => item.id === Number(id)));
 
+  // Carga el producto cada vez que cambia el id de la URL, reseteando imagen y cantidad
   useEffect(() => {
+    // Trae el detalle del producto seleccionado por id
     const fetchProductoDetalle = async () => {
       setCargando(true);
       setImagenActiva(0);
@@ -58,6 +61,7 @@ const ProductDetail = () => {
   const sinStock = stock <= 0;
   const categoriaNombre = producto.categorias?.[0]?.nombre;
 
+  // Alterna favorito; si no hay sesión, manda al login
   const handleToggleFavorite = () => {
     if (!isLoggedIn) {
       navigate('/login');
@@ -66,10 +70,12 @@ const ProductDetail = () => {
     dispatch(toggleFavorito(producto));
   };
 
+  // Agrega la cantidad elegida al carrito (usa el CartContext local, no el slice de Redux)
   const handleAgregarAlCarrito = () => {
     addToCart(producto, cantidad);
   };
 
+  // Agrega al carrito y navega directo al checkout
   const handleComprarAhora = () => {
     addToCart(producto, cantidad);
     navigate('/checkout');

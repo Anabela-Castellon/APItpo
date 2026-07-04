@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { apiFetch, apiUpload } from '../services/api';
 
+// Trae el catálogo completo de productos
 export const fetchProductos = createAsyncThunk(
   'productos/fetchAll',
   async (_, { rejectWithValue }) => {
@@ -13,6 +14,7 @@ export const fetchProductos = createAsyncThunk(
   }
 );
 
+// Trae todas las categorías (para filtros y el selector del formulario de producto)
 export const fetchCategorias = createAsyncThunk(
   'productos/fetchCategorias',
   async (_, { rejectWithValue }) => {
@@ -41,6 +43,7 @@ async function subirImagenes(productoId, imagenes) {
 }
 
 // Crea el producto, le asocia categorias y sube las imagenes seleccionadas
+// Crea el producto, le asocia categorías y sube las imágenes, en ese orden
 export const createProducto = createAsyncThunk(
   'productos/create',
   async ({ nombre, descripcion, precio, stock, categoriaIds = [], imagenes = [] }, { rejectWithValue }) => {
@@ -64,6 +67,7 @@ export const createProducto = createAsyncThunk(
   }
 );
 
+// Actualiza los datos del producto y sincroniza sus categorías (agrega las nuevas, quita las que ya no están)
 export const updateProducto = createAsyncThunk(
   'productos/update',
   async ({ id, nombre, descripcion, precio, stock, categoriaIds = [], previousCategoriaIds = [], imagenes = [] }, { rejectWithValue }) => {
@@ -93,6 +97,7 @@ export const updateProducto = createAsyncThunk(
   }
 );
 
+// Borra una imagen puntual de un producto y devuelve el producto actualizado
 export const deleteImagenProducto = createAsyncThunk(
   'productos/deleteImagen',
   async ({ productoId, imagenId }, { rejectWithValue }) => {
@@ -105,6 +110,7 @@ export const deleteImagenProducto = createAsyncThunk(
   }
 );
 
+// Elimina un producto por id
 export const deleteProducto = createAsyncThunk(
   'productos/delete',
   async (id, { rejectWithValue }) => {
@@ -125,12 +131,14 @@ const initialState = {
   error: null,
 };
 
+// Reemplaza el producto en la lista si ya existe, o lo agrega al principio si es nuevo
 const upsertProducto = (state, producto) => {
   const index = state.items.findIndex((p) => p.id === producto.id);
   if (index >= 0) state.items[index] = producto;
   else state.items.unshift(producto);
 };
 
+// Slice de productos: catálogo + categorías, y las operaciones CRUD del panel admin
 const productsSlice = createSlice({
   name: 'productos',
   initialState,

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.tpo.backend.model.Categoria;
 import com.uade.tpo.backend.service.CategoriaService;
 
+// Controlador de categorías de productos (lectura pública, escritura restringida por SecurityConfig)
 @RestController
 @RequestMapping("/api/categorias")
 public class CategoriaController {

@@ -7,6 +7,7 @@ import {
   removeProductoFromCart,
 } from '../store/cartSlice';
 
+// Versión simplificada/alternativa del carrito, usada en la ruta de prueba /cart-redux
 const CartRedux = () => {
   const dispatch = useDispatch();
   const { items, total, loading, error } = useSelector((state) => state.cart);

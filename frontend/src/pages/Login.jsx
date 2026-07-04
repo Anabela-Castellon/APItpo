@@ -13,6 +13,7 @@ import pedidosIcon from '../assets/pedidoss.png';
 
 import '../styles/login.css';
 
+// Página de login: formulario de email/contraseña que despacha el thunk loginUser
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  // Intenta loguear; si el thunk falla, muestra alerta de credenciales incorrectas
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -41,6 +43,7 @@ const Login = () => {
     }
   };
 
+  // Alterna entre mostrar la contraseña en texto plano o oculta
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };

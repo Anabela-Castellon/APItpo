@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import com.uade.tpo.backend.model.Consulta;
 
+// Acceso a datos de Consulta
 @Repository
 public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
+    // Lista todas las consultas ordenadas de la más reciente a la más antigua
     List<Consulta> findAllByOrderByFechaEnvioDesc();
 }

@@ -2,6 +2,7 @@ package com.uade.tpo.backend.dto;
 
 import lombok.Data;
 
+// DTO de salida para exponer un perfil sin datos sensibles ni relaciones completas de Usuario
 @Data
 public class PerfilResponseDTO {
 

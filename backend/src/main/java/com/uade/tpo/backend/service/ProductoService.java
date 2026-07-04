@@ -13,6 +13,7 @@ import com.uade.tpo.backend.repository.ProductoRepository;
 
 import jakarta.transaction.Transactional;
 
+// CRUD de productos y gestión de sus categorías asociadas
 @Service
 @Transactional
 public class ProductoService {
@@ -33,7 +34,7 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    // Filtrar por categoria
+    // Filtrar por categoria (valida antes que la categoría exista)
     public List<Producto> getProductosByCategoria(Long categoriaId) {
         // Validamos que la categoria exista
         categoriaRepository.findById(categoriaId)
@@ -65,7 +66,7 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
-    // Update
+    // Update (reemplaza los campos editables; solo pisa categorías si vienen datos nuevos)
     public Producto updateProducto(Long id, Producto updatedData) {
         return productoRepository.findById(id).map(producto -> {
             producto.setNombre(updatedData.getNombre());

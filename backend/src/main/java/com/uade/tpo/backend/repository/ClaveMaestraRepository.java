@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import com.uade.tpo.backend.model.ClaveMaestra;
 
+// Acceso a datos de ClaveMaestra (en la práctica solo existe un registro)
 @Repository
 public interface ClaveMaestraRepository extends JpaRepository<ClaveMaestra, Long> {
 }

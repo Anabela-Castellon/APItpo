@@ -23,6 +23,7 @@ import com.uade.tpo.backend.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+// Servicio de autenticación: registro de usuarios (con distintos roles) y login, devolviendo un JWT
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -34,14 +35,17 @@ public class CreationService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
+    // Registra un usuario CONSUMIDOR (rol por defecto)
     public String register(RegistrationRequestDTO request) {
         return registerWithRole(request, Rol.CONSUMIDOR);
     }
 
+    // Registra un usuario VENDEDOR
     public String registerVendedor(RegistrationRequestDTO request) {
         return registerWithRole(request, Rol.VENDEDOR);
     }
 
+    // Registra un usuario ADMIN, validando primero la clave maestra
     public String registerAdmin(RegistrationRequestDTO request) {
         String clave = request.getClaveMaestra() == null ? "" : request.getClaveMaestra();
         boolean claveValida = claveMaestraRepository.findAll().stream()
@@ -97,7 +101,8 @@ public class CreationService {
  
         return jwtUtil.generateToken(usuario.getEmail(), roles);
     }
- 
+
+    // Valida email/contraseña contra Spring Security y devuelve un JWT si son correctos
     public String authenticate(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -105,13 +110,13 @@ public class CreationService {
                         request.getPassworld()
                 )
         );
- 
+
         Usuario user = usuarioRepository.findByEmail(request.getEmail()).orElseThrow();
- 
+
         Set<String> roles = user.getAuthorities().stream()
                 .map(a -> a.getAuthority())
                 .collect(Collectors.toSet());
- 
+
         return jwtUtil.generateToken(user.getEmail(), roles);
     }
 }

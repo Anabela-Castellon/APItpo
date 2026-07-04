@@ -4,10 +4,12 @@ import { useSelector } from 'react-redux';
 import PerfilSidebar from './PerfilSidebar';
 import '../styles/perfil.css';
 
+// Layout compartido de las páginas de perfil (Mi perfil, Mis pedidos, Favoritos): sidebar + contenido
 const PerfilLayout = ({ children }) => {
     const navigate = useNavigate();
     const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
+    // Si no hay sesión, redirige al login
     useEffect(() => {
         if (!isLoggedIn) {
             navigate('/login');

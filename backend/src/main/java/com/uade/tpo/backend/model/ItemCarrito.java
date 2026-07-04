@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+// Entidad intermedia entre Carrito y Producto: representa una línea del carrito (producto + cantidad)
 @Data
 @Entity
 @Table(name = "items_carrito")
@@ -22,7 +23,8 @@ public class ItemCarrito {
     @ManyToOne
     @JoinColumn(name = "producto_id")
     private Producto producto;
-    
+
+    // Referencia inversa al carrito dueño (evita bucle infinito al serializar a JSON)
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "carrito_id")

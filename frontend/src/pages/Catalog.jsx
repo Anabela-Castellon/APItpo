@@ -21,6 +21,7 @@ const initialFiltros = {
   sortBy: 'relevancia',
 };
 
+// Página de catálogo: productos + filtros (búsqueda, categoría, precio, disponibilidad, orden)
 const Catalog = () => {
   const [searchParams] = useSearchParams();
   const [productos, setProductos] = useState([]);
@@ -29,11 +30,13 @@ const Catalog = () => {
   const [search, setSearch] = useState(searchParams.get('q') || '');
   const [filtros, setFiltros] = useState(initialFiltros);
 
+  // Sincroniza el buscador con el query param ?q= (por si se llega desde el Navbar)
   useEffect(() => {
     const q = searchParams.get('q');
     if (q !== null) setSearch(q);
   }, [searchParams]);
 
+  // Carga productos y categorías una sola vez al entrar a la página
   useEffect(() => {
     const cargarDatos = async () => {
       try {
@@ -53,6 +56,7 @@ const Catalog = () => {
     cargarDatos();
   }, []);
 
+  // Aplica todos los filtros y el orden en el cliente sobre la lista completa de productos
   const productosFiltrados = useMemo(() => {
     let resultado = [...productos];
 

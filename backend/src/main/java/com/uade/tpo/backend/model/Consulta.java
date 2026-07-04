@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+// Entidad Consulta: mensajes enviados desde el formulario de contacto público
 @Data
 @Entity
 @Table(name = "consultas")

@@ -4,12 +4,14 @@ import '../styles/misPedidos.css';
 
 // TODO: cuando exista un endpoint de pedidos en el backend (por ejemplo
 // GET /api/pedidos/usuario/{id}), reemplazar estos datos de ejemplo por el historial real.
+// Helper para generar fechas mock relativas a "hoy" (usado solo por PEDIDOS_MOCK)
 const haceDias = (dias) => {
   const fecha = new Date();
   fecha.setDate(fecha.getDate() - dias);
   return fecha;
 };
 
+// Datos de ejemplo (hardcodeados) hasta que exista el endpoint real de pedidos
 const PEDIDOS_MOCK = [
   {
     id: 1,
@@ -124,6 +126,7 @@ const FECHA_OPCIONES = [
   { value: '180', label: 'Últimos 6 meses' },
 ];
 
+// Página "Mis pedidos": listado filtrable (mock) + panel de detalle del pedido seleccionado
 const MisPedidos = () => {
   const [busqueda, setBusqueda] = useState('');
   const [estadoFiltro, setEstadoFiltro] = useState('');
@@ -131,6 +134,7 @@ const MisPedidos = () => {
   const [seleccionadoId, setSeleccionadoId] = useState(PEDIDOS_MOCK[0]?.id ?? null);
   const [verTodosProductos, setVerTodosProductos] = useState(false);
 
+  // Filtra los pedidos mock por número, estado y antigüedad
   const pedidosFiltrados = useMemo(() => {
     const ahora = Date.now();
     return PEDIDOS_MOCK.filter((p) => {
@@ -143,11 +147,13 @@ const MisPedidos = () => {
 
   const pedidoSeleccionado = pedidosFiltrados.find((p) => p.id === seleccionadoId) || null;
 
+  // Selecciona un pedido para ver su detalle; si se vuelve a tocar el mismo, lo deselecciona
   const seleccionarPedido = (id) => {
     setSeleccionadoId((prev) => (prev === id ? null : id));
     setVerTodosProductos(false);
   };
 
+  // Suma los items y le agrega el costo de envío
   const calcularTotal = (pedido) => {
     const subtotal = pedido.items.reduce((acc, item) => acc + item.precio, 0);
     return { subtotal, total: subtotal + pedido.envio };

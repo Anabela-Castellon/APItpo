@@ -36,6 +36,7 @@ const HomeIcon = () => (
 
 const emptyForm = { nombre: '', apellido: '', telefono: '', direccion: '' };
 
+// Página "Mi perfil": muestra y permite editar los datos personales del usuario logueado (endpoint /me)
 const Perfil = () => {
     const [perfil, setPerfil] = useState(null);
     const [form, setForm] = useState(emptyForm);
@@ -46,6 +47,7 @@ const Perfil = () => {
     const [notificaciones, setNotificaciones] = useState(true);
     const [emails, setEmails] = useState(true);
 
+    // Carga el perfil propio al entrar a la página
     useEffect(() => {
         const cargarPerfil = async () => {
             try {
@@ -70,6 +72,7 @@ const Perfil = () => {
         setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
+    // Guarda los cambios del formulario contra el backend y sale del modo edición
     const handleGuardar = async (e) => {
         e.preventDefault();
         setGuardando(true);
@@ -88,6 +91,7 @@ const Perfil = () => {
         }
     };
 
+    // Descarta los cambios sin guardar, volviendo el formulario a los datos actuales del perfil
     const handleCancelar = () => {
         setForm({
             nombre: perfil?.nombre || '',
