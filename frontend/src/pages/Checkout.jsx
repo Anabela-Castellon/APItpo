@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { checkoutCart } from '../store/cartSlice';
+import '../styles/cart.css';
+import '../styles/checkout.css';
 
 // Página de confirmación de compra: muestra el resumen del carrito y dispara el checkout contra la API
 const Checkout = () => {
@@ -26,82 +28,55 @@ const Checkout = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '700px', margin: '0 auto' }}>
-      <h1>Confirmar Compra</h1>
+    <div className="page-container checkout-page">
+      <div className="cart-header">
+        <h1>Confirmar compra</h1>
+        <p className="cart-subtitle">Revisá el resumen antes de confirmar tu pedido.</p>
+      </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <div className="cart-error">Error al confirmar la compra: {error}</div>}
 
       {cartItems.length === 0 ? (
-        <p>No hay productos en el carrito.</p>
+        <div className="cart-empty">
+          <p>No hay productos en el carrito.</p>
+          <Link to="/" className="btn-continue">Seguir comprando</Link>
+        </div>
       ) : (
-        <div style={{ marginBottom: '1.5rem' }}>
+        <div className="checkout-card">
           <h2>Resumen del pedido</h2>
 
-          {cartItems.map(item => {
-            const producto = item.producto || item;
-            const cantidad = item.cantidad || item.quantity || 1;
-            return (
-              <div
-                key={item.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  padding: '0.5rem 0',
-                  borderBottom: '1px solid #eee'
-                }}
-              >
-                <span>{producto.nombre} x{cantidad}</span>
-                <span style={{ fontWeight: 'bold' }}>
-                  ${((producto.precio || 0) * cantidad).toLocaleString('es-AR')}
-                </span>
-              </div>
-            );
-          })}
+          <div className="checkout-items">
+            {cartItems.map(item => {
+              const producto = item.producto || item;
+              const cantidad = item.cantidad || item.quantity || 1;
+              return (
+                <div key={item.id} className="summary-row checkout-item">
+                  <span>{producto.nombre}<span className="checkout-item-qty">x{cantidad}</span></span>
+                  <span>${((producto.precio || 0) * cantidad).toLocaleString('es-AR')}</span>
+                </div>
+              );
+            })}
+          </div>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: '1rem 0',
-            fontSize: '1.2rem',
-            fontWeight: 'bold'
-          }}>
-            <span>Total:</span>
+          <div className="summary-total">
+            <span>Total</span>
             <span>${(total || 0).toLocaleString('es-AR')}</span>
           </div>
+
+          <div className="checkout-actions">
+            <Link to="/cart" className="btn-continue">← Volver al carrito</Link>
+            <button
+              onClick={handleConfirmar}
+              disabled={confirmando || loading}
+              className="btn-checkout"
+            >
+              {confirmando ? 'Confirmando...' : 'Confirmar compra'}
+            </button>
+          </div>
+
+          <p className="cart-secure">🔒 Compra 100% segura y protegida.</p>
         </div>
       )}
-
-      <div style={{ display: 'flex', gap: '1rem' }}>
-        <Link
-          to="/cart"
-          style={{
-            backgroundColor: '#333',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '4px',
-            textDecoration: 'none'
-          }}
-        >
-          Volver al carrito
-        </Link>
-
-        {cartItems.length > 0 && (
-          <button
-            onClick={handleConfirmar}
-            disabled={confirmando || loading}
-            style={{
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: confirmando ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {confirmando ? 'Confirmando...' : 'Confirmar compra'}
-          </button>
-        )}
-      </div>
     </div>
   );
 };
