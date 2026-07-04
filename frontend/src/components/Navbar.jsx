@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import logo from '../assets/laEsquinaLogo.png';
 import { logout } from '../store/authSlice';
+import { fetchCartItems } from '../store/cartSlice';
 import '../styles/navbar.css';
 
 const SearchIcon = () => (
@@ -54,6 +55,15 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Al montar (incluyendo un F5 en cualquier página) o al iniciar sesión,
+  // sincronizamos el carrito para que el contador se muestre sin depender
+  // de que otro componente (como la página /cart) lo haya hecho antes.
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchCartItems());
+    }
+  }, [dispatch, isLoggedIn]);
 
   const handleLogout = () => {
     dispatch(logout());
