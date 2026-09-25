@@ -1,5 +1,4 @@
-# API TPO 1C-2026
-
+## API TPO 1C-2026
 Trabajo Práctico Integrador desarrollado para la materia Aplicaciones Interactivas.
 
 ## Tecnologías
@@ -8,6 +7,7 @@ Trabajo Práctico Integrador desarrollado para la materia Aplicaciones Interacti
 - JavaScript
 - MySQL
 - GitHub
+- Xampp
 
 ## Mi participación
 - Desarrollo del frontend
