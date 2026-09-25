@@ -1,5 +1,4 @@
-## API TPO 1C-2026
-Trabajo Práctico Integrador desarrollado para la materia Aplicaciones Interactivas.
+## API TPO 1C-2026 Trabajo Práctico Integrador desarrollado para la materia Aplicaciones Interactivas.
 
 ## Tecnologías
 - Java
